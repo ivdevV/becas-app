@@ -32,6 +32,8 @@ Si el token contiene `$`, escribelo como `\$` dentro de las comillas para que Ne
 
 Si `MAIL_HOST` esta configurado, cada solicitud recibida correctamente envia una notificacion a `SCHOLARSHIP_NOTIFICATION_TO` con los datos del solicitante, la beca seleccionada y el listado de documentos subidos. Para AWS SES, usa las credenciales SMTP generadas en SES, verifica el dominio o remitente de `MAIL_FROM`, y cambia `email-smtp.eu-west-1.amazonaws.com` por el endpoint de la region que corresponda si no usas Irlanda. Si no hay SMTP configurado, el formulario sigue funcionando y deja constancia en el log del servidor.
 
+En AWS SES, `MAIL_USER` debe ser el valor **SMTP Username** y `MAIL_PASSWORD` debe ser **SMTP Password**. No uses `AWS_ACCESS_KEY_ID` ni `AWS_SECRET_ACCESS_KEY`; SES SMTP los rechaza con `535 Authentication Credentials Invalid`.
+
 ## Desarrollo
 
 ```bash
