@@ -100,22 +100,37 @@ export async function sendScholarshipDocumentToOdoo(
     );
   }
 
-  const response = await fetch(webhookUrl, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${webhookToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: input.email,
-      filename: input.filename,
-      document_name: input.documentName,
-      scholarship_type_key: input.scholarshipTypeKey,
-      scholarship_type_name: input.scholarshipTypeName,
-      document_content_base64: input.documentContentBase64,
-      note: input.note,
-    }),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${webhookToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: input.email,
+        filename: input.filename,
+        document_name: input.documentName,
+        scholarship_type_key: input.scholarshipTypeKey,
+        scholarship_type_name: input.scholarshipTypeName,
+        document_content_base64: input.documentContentBase64,
+        note: input.note,
+      }),
+    });
+  } catch (error) {
+    const target = getWebhookTarget(webhookUrl);
+
+    return {
+      ok: false,
+      error: "odoo_request_failed",
+      message: error instanceof Error ? error.message : "Unexpected fetch error",
+      details: {
+        ...target,
+      },
+    };
+  }
 
   const payload = parseOdooResponse(await response.text(), response, webhookUrl);
 

@@ -234,6 +234,16 @@ export async function POST(request: Request) {
   } catch (error) {
     const isConfigError = error instanceof OdooWebhookConfigError;
 
+    console.error("Scholarship application submission failed", {
+      isConfigError,
+      name,
+      email,
+      scholarshipId,
+      scholarshipName: scholarship?.name,
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
     return NextResponse.json<ApplicationResponse>(
       {
         ok: false,
