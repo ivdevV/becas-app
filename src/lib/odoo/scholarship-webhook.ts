@@ -56,10 +56,11 @@ export async function sendScholarshipDocumentToOdoo(
     }),
   });
 
+  const contentType = response.headers.get("content-type") ?? "unknown content type";
   const payload = (await response.json().catch(() => ({
     ok: false,
     error: "invalid_odoo_response",
-    message: "Odoo did not return a valid JSON response.",
+    message: `Odoo returned HTTP ${response.status} with ${contentType}, not JSON.`,
   }))) as OdooWebhookResponse;
 
   if (!response.ok && payload.ok !== false) {

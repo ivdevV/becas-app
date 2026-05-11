@@ -17,10 +17,11 @@ Copia `.env.example` a `.env.local` y ajusta los valores:
 ```env
 ODOO_MODE=dev
 ODOO_SCHOLARSHIP_WEBHOOK_URL=https://tu-odoo.com/irg/scholarship/webhook/document
-ODOO_SCHOLARSHIP_WEBHOOK_TOKEN=becas_2026_un_token_largo_y_secreto
+ODOO_SCHOLARSHIP_WEBHOOK_TOKEN="becas_2026_un_token_largo_y_secreto"
 ```
 
 El token debe coincidir con el parametro de sistema de Odoo `irg_student_scholarship_webhook.token`.
+Si el token contiene `$`, escribelo como `\$` dentro de las comillas para que Next.js no lo interprete como otra variable de entorno.
 
 ## Desarrollo
 
