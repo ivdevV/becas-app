@@ -3,6 +3,7 @@ export type OdooWebhookDocumentInput = {
   filename: string;
   documentName: string;
   documentContentBase64: string;
+  scholarshipTypeName: string;
   note: string;
 };
 
@@ -51,6 +52,7 @@ export async function sendScholarshipDocumentToOdoo(
       email: input.email,
       filename: input.filename,
       document_name: input.documentName,
+      scholarship_type_name: input.scholarshipTypeName,
       document_content_base64: input.documentContentBase64,
       note: input.note,
     }),

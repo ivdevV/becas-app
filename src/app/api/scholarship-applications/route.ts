@@ -53,6 +53,18 @@ async function fileToBase64(file: File) {
   return buffer.toString("base64");
 }
 
+function getOdooErrorStatus(error: string) {
+  if (error === "partner_not_found" || error === "scholarship_type_not_found") {
+    return 404;
+  }
+
+  if (error === "ambiguous_email" || error === "ambiguous_scholarship_type") {
+    return 409;
+  }
+
+  return 502;
+}
+
 export async function POST(request: Request) {
   const formData = await request.formData();
   const name = getText(formData, "name");
@@ -125,6 +137,7 @@ export async function POST(request: Request) {
         email,
         filename: file.name,
         documentName: document.label,
+        scholarshipTypeName: scholarship.name,
         documentContentBase64: await fileToBase64(file),
         note: `Solicitud externa de ${name}. Tipo de beca: ${scholarship.name}.`,
       });
@@ -146,7 +159,7 @@ export async function POST(request: Request) {
               },
             ],
           },
-          { status: result.error === "partner_not_found" ? 404 : result.error === "ambiguous_email" ? 409 : 502 },
+          { status: getOdooErrorStatus(result.error) },
         );
       }
 
