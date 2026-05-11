@@ -65,6 +65,22 @@ function getOdooErrorStatus(error: string) {
   return 502;
 }
 
+function getPublicSubmissionError(error: string, fallbackMessage: string) {
+  if (error === "partner_not_found") {
+    return "No hemos encontrado una ficha asociada a ese correo electronico. Revisa el email o contacta con admisiones.";
+  }
+
+  if (error === "ambiguous_email") {
+    return "Hemos encontrado mas de una ficha asociada a ese correo electronico. Contacta con admisiones para revisar tus datos.";
+  }
+
+  if (error === "scholarship_type_not_found" || error === "ambiguous_scholarship_type") {
+    return "No se pudo identificar correctamente el tipo de beca seleccionado. Contacta con admisiones para finalizar la solicitud.";
+  }
+
+  return fallbackMessage || "No se pudo enviar la solicitud. Intentalo de nuevo mas tarde.";
+}
+
 export async function POST(request: Request) {
   const formData = await request.formData();
   const name = getText(formData, "name");
@@ -123,7 +139,7 @@ export async function POST(request: Request) {
       ok: true,
       mode,
       applicationId: `DEV-${Date.now()}`,
-      message: "Solicitud validada en modo desarrollo. No se ha enviado documentacion real a Odoo.",
+      message: "Solicitud recibida correctamente. Revisaremos la documentacion y contactaremos contigo.",
       documents: submittedDocuments,
     });
   }
@@ -147,7 +163,7 @@ export async function POST(request: Request) {
           {
             ok: false,
             mode,
-            message: result.message,
+            message: getPublicSubmissionError(result.error, result.message),
             documents: [
               ...documentResults,
               {
@@ -175,8 +191,8 @@ export async function POST(request: Request) {
     return NextResponse.json<ApplicationResponse>({
       ok: true,
       mode,
-      applicationId: `ODOO-${Date.now()}`,
-      message: "Solicitud enviada correctamente a Odoo.",
+      applicationId: `SOL-${Date.now()}`,
+      message: "Solicitud recibida correctamente. Revisaremos la documentacion y contactaremos contigo.",
       documents: documentResults,
     });
   } catch (error) {
@@ -187,8 +203,8 @@ export async function POST(request: Request) {
         ok: false,
         mode,
         message: isConfigError
-          ? "La integracion con Odoo no esta configurada. Revisa las variables de entorno."
-          : "No se pudo enviar la solicitud a Odoo. Intentalo de nuevo mas tarde.",
+          ? "El servicio de solicitudes no esta disponible temporalmente. Intentalo de nuevo mas tarde."
+          : "No se pudo enviar la solicitud. Intentalo de nuevo mas tarde.",
       },
       { status: isConfigError ? 500 : 502 },
     );

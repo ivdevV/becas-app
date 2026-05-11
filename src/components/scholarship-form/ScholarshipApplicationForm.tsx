@@ -98,7 +98,7 @@ export function ScholarshipApplicationForm() {
 
       setSubmitState({
         status: "success",
-        message: payload.message ?? "Solicitud enviada correctamente.",
+        message: payload.message ?? "Solicitud recibida correctamente. Revisaremos la documentacion y contactaremos contigo.",
         applicationId: payload.applicationId,
       });
     } catch {
@@ -114,13 +114,23 @@ export function ScholarshipApplicationForm() {
       <section className="grid gap-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
         <div className="flex flex-col justify-between gap-6">
           <div className="space-y-4">
-            <p className="text-sm font-semibold uppercase text-teal-700">Solicitud de beca IRG</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex min-h-14 min-w-40 items-center gap-3 rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#4ab5f0] text-sm font-bold text-white">
+                  IRG
+                </span>
+                <span className="text-sm font-semibold leading-5 text-slate-800">
+                  Instituto Raimon Gaja
+                </span>
+              </div>
+              <p className="text-sm font-semibold uppercase text-[#1684bd]">Solicitud de beca</p>
+            </div>
             <div className="space-y-3">
               <h1 className="max-w-2xl text-3xl font-semibold text-slate-950 sm:text-4xl">
                 Envia tu documentacion para evaluacion academica
               </h1>
               <p className="max-w-2xl text-base leading-7 text-slate-600">
-                El formulario prepara los datos y la documentacion para el modulo de becas de Odoo 16. En desarrollo valida el envio; en produccion usa el webhook protegido por token.
+                Completa tus datos, selecciona la beca que quieres solicitar y adjunta la documentacion necesaria para que el equipo academico pueda revisar tu candidatura.
               </p>
             </div>
           </div>
@@ -132,7 +142,7 @@ export function ScholarshipApplicationForm() {
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-slate-200">
               <div
-                className="h-full rounded-full bg-teal-700 transition-all"
+                className="h-full rounded-full bg-[#4ab5f0] transition-all"
                 style={{ width: `${(completedDocuments / selectedScholarship.documents.length) * 100}%` }}
               />
             </div>
@@ -146,7 +156,7 @@ export function ScholarshipApplicationForm() {
               required
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="min-h-12 rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#4ab5f0] focus:ring-4 focus:ring-[#4ab5f0]/20"
               placeholder="Nombre y apellidos"
             />
           </label>
@@ -158,7 +168,7 @@ export function ScholarshipApplicationForm() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="min-h-12 rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-teal-700 focus:ring-4 focus:ring-teal-100"
+              className="min-h-12 rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#4ab5f0] focus:ring-4 focus:ring-[#4ab5f0]/20"
               placeholder="alumno@example.com"
             />
           </label>
@@ -183,7 +193,7 @@ export function ScholarshipApplicationForm() {
                 key={scholarship.id}
                 className={`flex min-h-48 cursor-pointer flex-col gap-3 rounded-lg border bg-white p-4 transition ${
                   isSelected
-                    ? "border-teal-700 shadow-sm ring-4 ring-teal-100"
+                    ? "border-[#4ab5f0] shadow-sm ring-4 ring-[#4ab5f0]/20"
                     : "border-slate-200 hover:border-slate-400"
                 }`}
               >
@@ -194,7 +204,7 @@ export function ScholarshipApplicationForm() {
                   checked={isSelected}
                   onChange={() => handleScholarshipChange(scholarship.id)}
                 />
-                <span className="text-xs font-semibold uppercase text-teal-700">{categoryLabel[scholarship.category]}</span>
+                <span className="text-xs font-semibold uppercase text-[#1684bd]">{categoryLabel[scholarship.category]}</span>
                 <span className="text-lg font-semibold leading-6 text-slate-950">{scholarship.name}</span>
                 <span className="text-sm font-medium text-slate-700">{scholarship.maxDiscount}</span>
                 <span className="text-sm leading-6 text-slate-600">{scholarship.summary}</span>
@@ -225,7 +235,7 @@ export function ScholarshipApplicationForm() {
                   type="file"
                   accept={allowedFileExtensions.join(",")}
                   onChange={(event) => handleFileChange(document.id, event.target.files?.[0])}
-                  className="min-h-12 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-teal-700 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white focus:outline-none focus:ring-4 focus:ring-teal-100"
+                  className="min-h-12 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-[#4ab5f0] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white focus:outline-none focus:ring-4 focus:ring-[#4ab5f0]/20"
                 />
                 <span className="min-h-5 text-sm text-slate-600">
                   {file ? `${file.name} (${formatBytes(file.size)})` : "Pendiente de seleccionar"}
@@ -240,7 +250,7 @@ export function ScholarshipApplicationForm() {
         <div className="space-y-3">
           <h2 className="text-xl font-semibold text-slate-950">Revision</h2>
           <p className="text-sm leading-6 text-slate-600">
-            La documentacion se enviara al modulo de becas. Odoo hara la busqueda del alumno o contacto por correo electronico y asociara los documentos encontrados.
+            Tu solicitud se enviara al equipo de becas para revisar la documentacion aportada y valorar la ayuda que mejor encaja con tu perfil.
           </p>
           <label className="flex items-start gap-3 text-sm leading-6 text-slate-700">
             <input
@@ -248,7 +258,7 @@ export function ScholarshipApplicationForm() {
               type="checkbox"
               checked={privacyAccepted}
               onChange={(event) => setPrivacyAccepted(event.target.checked)}
-              className="mt-1 h-5 w-5 rounded border-slate-300 text-teal-700 focus:ring-teal-100"
+              className="mt-1 h-5 w-5 rounded border-slate-300 text-[#4ab5f0] focus:ring-[#4ab5f0]/20"
             />
             <span>
               Confirmo que la informacion es veraz y acepto la politica de privacidad del Instituto Raimon Gaja.
@@ -268,7 +278,7 @@ export function ScholarshipApplicationForm() {
           <button
             type="submit"
             disabled={submitState.status === "submitting"}
-            className="min-h-12 rounded-md bg-teal-700 px-5 text-base font-semibold text-white transition hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-100 disabled:cursor-not-allowed disabled:opacity-60"
+            className="min-h-12 rounded-md bg-[#4ab5f0] px-5 text-base font-semibold text-white transition hover:bg-[#1684bd] focus:outline-none focus:ring-4 focus:ring-[#4ab5f0]/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitState.status === "submitting" ? "Enviando..." : "Enviar solicitud"}
           </button>

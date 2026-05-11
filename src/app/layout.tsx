@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Solicitud de becas | Instituto Raimon Gaja",
-  description: "Formulario de solicitud y documentacion de becas conectado con Odoo.",
+  description: "Formulario de solicitud y documentacion de becas del Instituto Raimon Gaja.",
 };
 
 export default function RootLayout({
