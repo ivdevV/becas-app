@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useMemo, useState } from "react";
 import {
   allowedFileExtensions,
@@ -115,13 +116,15 @@ export function ScholarshipApplicationForm() {
         <div className="flex flex-col justify-between gap-6">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex min-h-14 min-w-40 items-center gap-3 rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#4ab5f0] text-sm font-bold text-white">
-                  IRG
-                </span>
-                <span className="text-sm font-semibold leading-5 text-slate-800">
-                  Instituto Raimon Gaja
-                </span>
+              <div className="flex min-h-16 items-center rounded-md border border-slate-200 bg-white px-4 py-3">
+                <Image
+                  src="/7cc4845ce8a62d935d2dd0db23209c3ca8d5463f-587x282.avif"
+                  alt="Instituto Raimon Gaja"
+                  width={156}
+                  height={75}
+                  priority
+                  className="h-auto w-32 sm:w-36"
+                />
               </div>
               <p className="text-sm font-semibold uppercase text-[#1684bd]">Solicitud de beca</p>
             </div>
