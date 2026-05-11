@@ -48,10 +48,11 @@ La app envia un JSON por cada documento con esta forma:
 	"email": "alumno@example.com",
 	"filename": "solicitud_beca.pdf",
 	"document_name": "Solicitud de beca",
+	"scholarship_type_key": "merito-academico",
 	"scholarship_type_name": "Beca Merito Academico",
 	"document_content_base64": "JVBERi0xLjQK...",
 	"note": "Enviado desde la aplicacion externa"
 }
 ```
 
-Odoo resuelve el email contra `op.student.partner_id.email` y despues contra `res.partner.email`, asigna `res.partner.irg_scholarship_type_id` si recibe `scholarship_type_name`, y guarda los documentos en `irg.scholarship.document`.
+Odoo resuelve el email contra `op.student.partner_id.email` y despues contra `res.partner.email`, asigna `res.partner.irg_scholarship_type_id` si recibe `scholarship_type_key` o `scholarship_type_name`, y guarda los documentos en `irg.scholarship.document`.

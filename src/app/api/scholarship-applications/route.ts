@@ -153,6 +153,7 @@ export async function POST(request: Request) {
         email,
         filename: file.name,
         documentName: document.label,
+        scholarshipTypeKey: scholarship.id,
         scholarshipTypeName: scholarship.name,
         documentContentBase64: await fileToBase64(file),
         note: `Solicitud externa de ${name}. Tipo de beca: ${scholarship.name}.`,
