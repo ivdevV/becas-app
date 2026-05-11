@@ -18,19 +18,19 @@ Copia `.env.example` a `.env.local` y ajusta los valores:
 ODOO_MODE=dev
 ODOO_SCHOLARSHIP_WEBHOOK_URL=https://tu-odoo.com/irg/scholarship/webhook/document
 ODOO_SCHOLARSHIP_WEBHOOK_TOKEN="becas_2026_un_token_largo_y_secreto"
-MAIL_HOST=smtp.example.com
+MAIL_HOST=email-smtp.eu-west-1.amazonaws.com
 MAIL_PORT=587
 MAIL_SECURE=false
-MAIL_USER=usuario-smtp
-MAIL_PASSWORD="password-smtp"
-MAIL_FROM="Becas IRG <becas.irg@institutoraimongaja.com>"
+MAIL_USER=AKIAXXXXXXXXXXXXXXXX
+MAIL_PASSWORD="tu-password-smtp-de-aws-ses"
+MAIL_FROM="Becas IRG <no-reply@institutoraimongaja.com>"
 SCHOLARSHIP_NOTIFICATION_TO=becas.irg@institutoraimongaja.com
 ```
 
 El token debe coincidir con el parametro de sistema de Odoo `irg_student_scholarship_webhook.token`.
 Si el token contiene `$`, escribelo como `\$` dentro de las comillas para que Next.js no lo interprete como otra variable de entorno.
 
-Si `MAIL_HOST` esta configurado, cada solicitud recibida correctamente envia una notificacion a `SCHOLARSHIP_NOTIFICATION_TO` con los datos del solicitante, la beca seleccionada y el listado de documentos subidos. Si no hay SMTP configurado, el formulario sigue funcionando y deja constancia en el log del servidor.
+Si `MAIL_HOST` esta configurado, cada solicitud recibida correctamente envia una notificacion a `SCHOLARSHIP_NOTIFICATION_TO` con los datos del solicitante, la beca seleccionada y el listado de documentos subidos. Para AWS SES, usa las credenciales SMTP generadas en SES, verifica el dominio o remitente de `MAIL_FROM`, y cambia `email-smtp.eu-west-1.amazonaws.com` por el endpoint de la region que corresponda si no usas Irlanda. Si no hay SMTP configurado, el formulario sigue funcionando y deja constancia en el log del servidor.
 
 ## Desarrollo
 
