@@ -112,32 +112,32 @@ export function ScholarshipApplicationForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
-      <section className="grid gap-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:p-8">
-        <div className="flex flex-col justify-between gap-6">
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex min-h-16 items-center rounded-md border border-slate-200 bg-white px-4 py-3">
-                <Image
-                  src="/7cc4845ce8a62d935d2dd0db23209c3ca8d5463f-587x282.avif"
-                  alt="Instituto Raimon Gaja"
-                  width={156}
-                  height={75}
-                  priority
-                  className="h-auto w-32 sm:w-36"
-                />
-              </div>
-              <p className="text-sm font-semibold uppercase text-[#1684bd]">Solicitud de beca</p>
+      <section className="grid gap-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6 lg:p-8">
+        <div className="space-y-4">
+          <div className="flex flex-col items-center justify-center gap-3 text-center">
+            <div className="flex min-h-16 items-center rounded-md border border-slate-200 bg-white px-4 py-3">
+              <Image
+                src="/7cc4845ce8a62d935d2dd0db23209c3ca8d5463f-587x282.avif"
+                alt="Instituto Raimon Gaja"
+                width={156}
+                height={75}
+                priority
+                className="h-auto w-32 sm:w-36"
+              />
             </div>
-            <div className="space-y-3">
-              <h1 className="max-w-2xl text-3xl font-semibold text-slate-950 sm:text-4xl">
-                Envia tu documentacion para evaluacion academica
-              </h1>
-              <p className="max-w-2xl text-base leading-7 text-slate-600">
-                Completa tus datos, selecciona la beca que quieres solicitar y adjunta la documentacion necesaria para que el equipo academico pueda revisar tu candidatura.
-              </p>
-            </div>
+            <p className="text-lg font-semibold uppercase text-[#1684bd] sm:text-xl">Solicitud de beca</p>
           </div>
+          <div className="grid gap-3 lg:max-w-5xl">
+            <h1 className="text-3xl font-semibold text-slate-950 sm:text-4xl">
+              Envia tu documentacion para evaluacion academica
+            </h1>
+            <p className="max-w-4xl text-base leading-7 text-slate-600">
+              Completa tus datos, selecciona la beca que quieres solicitar y adjunta la documentacion necesaria para que el equipo academico pueda revisar tu candidatura.
+            </p>
+          </div>
+        </div>
 
+        <div className="grid items-end gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="grid gap-3 rounded-md bg-slate-50 p-4 text-sm text-slate-700">
             <div className="flex items-center justify-between gap-4">
               <span>Documentos requeridos</span>
@@ -150,31 +150,31 @@ export function ScholarshipApplicationForm() {
               />
             </div>
           </div>
-        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-2 text-sm font-medium text-slate-800">
-            Nombre completo
-            <input
-              required
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="min-h-12 rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#4ab5f0] focus:ring-4 focus:ring-[#4ab5f0]/20"
-              placeholder="Nombre y apellidos"
-            />
-          </label>
+          <div className="grid items-start gap-4 sm:grid-cols-2">
+            <label className="grid content-start gap-2 text-sm font-medium text-slate-800">
+              Nombre completo
+              <input
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                className="h-12 w-full rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#4ab5f0] focus:ring-4 focus:ring-[#4ab5f0]/20"
+                placeholder="Nombre y apellidos"
+              />
+            </label>
 
-          <label className="grid gap-2 text-sm font-medium text-slate-800">
-            Correo electronico
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="min-h-12 rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#4ab5f0] focus:ring-4 focus:ring-[#4ab5f0]/20"
-              placeholder="alumno@example.com"
-            />
-          </label>
+            <label className="grid content-start gap-2 text-sm font-medium text-slate-800">
+              Correo electronico
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="h-12 w-full rounded-md border border-slate-300 bg-white px-4 text-base text-slate-950 outline-none transition focus:border-[#4ab5f0] focus:ring-4 focus:ring-[#4ab5f0]/20"
+                placeholder="alumno@example.com"
+              />
+            </label>
+          </div>
         </div>
       </section>
 

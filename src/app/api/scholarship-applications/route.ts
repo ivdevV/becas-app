@@ -9,6 +9,7 @@ import {
   sendScholarshipDocumentToOdoo,
   type OdooWebhookResponse,
 } from "@/lib/odoo/scholarship-webhook";
+import { sendScholarshipApplicationNotification } from "@/lib/email/scholarship-notification";
 
 export const runtime = "nodejs";
 
@@ -135,10 +136,20 @@ export async function POST(request: Request) {
   const mode = getMode();
 
   if (mode === "dev") {
+    const applicationId = `DEV-${Date.now()}`;
+
+    await notifyScholarshipTeam({
+      applicationId,
+      name,
+      email,
+      scholarship,
+      documents: submittedDocuments,
+    });
+
     return NextResponse.json<ApplicationResponse>({
       ok: true,
       mode,
-      applicationId: `DEV-${Date.now()}`,
+      applicationId,
       message: "Solicitud recibida correctamente. Revisaremos la documentacion y contactaremos contigo.",
       documents: submittedDocuments,
     });
@@ -198,10 +209,20 @@ export async function POST(request: Request) {
       });
     }
 
+    const applicationId = `SOL-${Date.now()}`;
+
+    await notifyScholarshipTeam({
+      applicationId,
+      name,
+      email,
+      scholarship,
+      documents: documentResults,
+    });
+
     return NextResponse.json<ApplicationResponse>({
       ok: true,
       mode,
-      applicationId: `SOL-${Date.now()}`,
+      applicationId,
       message: "Solicitud recibida correctamente. Revisaremos la documentacion y contactaremos contigo.",
       documents: documentResults,
     });
@@ -218,5 +239,29 @@ export async function POST(request: Request) {
       },
       { status: isConfigError ? 500 : 502 },
     );
+  }
+}
+
+async function notifyScholarshipTeam(input: {
+  applicationId: string;
+  name: string;
+  email: string;
+  scholarship: NonNullable<ReturnType<typeof findScholarship>>;
+  documents: SubmittedDocument[];
+}) {
+  try {
+    await sendScholarshipApplicationNotification({
+      applicationId: input.applicationId,
+      name: input.name,
+      email: input.email,
+      scholarship: input.scholarship,
+      documents: input.documents.map((document) => ({
+        documentName: document.documentName,
+        filename: document.filename,
+        size: document.size,
+      })),
+    });
+  } catch (error) {
+    console.error("Scholarship notification email failed", error);
   }
 }
