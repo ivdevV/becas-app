@@ -160,6 +160,15 @@ export async function POST(request: Request) {
       });
 
       if (!result.ok) {
+        console.error("Scholarship webhook rejected document", {
+          error: result.error,
+          message: result.message,
+          scholarshipTypeKey: scholarship.id,
+          scholarshipTypeName: scholarship.name,
+          documentName: document.label,
+          status: getOdooErrorStatus(result.error),
+        });
+
         return NextResponse.json<ApplicationResponse>(
           {
             ok: false,
