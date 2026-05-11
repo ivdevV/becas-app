@@ -79,6 +79,10 @@ function getPublicSubmissionError(error: string, fallbackMessage: string) {
     return "No se pudo identificar correctamente el tipo de beca seleccionado. Contacta con admisiones para finalizar la solicitud.";
   }
 
+  if (error === "invalid_odoo_response" || error === "odoo_request_failed") {
+    return "No se pudo enviar la solicitud por una incidencia temporal del servicio academico. Intentalo de nuevo mas tarde o contacta con admisiones.";
+  }
+
   return fallbackMessage || "No se pudo enviar la solicitud. Intentalo de nuevo mas tarde.";
 }
 
@@ -177,6 +181,7 @@ export async function POST(request: Request) {
           scholarshipTypeKey: scholarship.id,
           scholarshipTypeName: scholarship.name,
           documentName: document.label,
+          details: result.details,
           status: getOdooErrorStatus(result.error),
         });
 
