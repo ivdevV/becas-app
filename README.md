@@ -40,6 +40,8 @@ En AWS SES, `MAIL_USER` debe ser el valor **SMTP Username** y `MAIL_PASSWORD` de
 
 Si `GOOGLE_SHEETS_SPREADSHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL` y `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` estan configurados, cada solicitud aceptada por Odoo en `ODOO_MODE=prod` se registra en una fila de Google Sheets. Comparte la hoja con el email de la service account como editor. La pestaña usada por defecto es `Hoja 1`.
 
+En produccion, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` debe contener la clave PEM de la service account. La app acepta la clave con saltos de linea reales, con `\n` escapados, con comillas envolventes o codificada en base64.
+
 La escritura en Google Sheets no bloquea la solicitud: si Odoo acepta la documentacion pero Google Sheets falla, el usuario ve la solicitud como recibida y el error queda registrado en los logs del servidor.
 
 ## Desarrollo
