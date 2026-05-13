@@ -10,6 +10,7 @@ import {
   type OdooWebhookResponse,
 } from "@/lib/odoo/scholarship-webhook";
 import { sendScholarshipApplicationNotification } from "@/lib/email/scholarship-notification";
+import { appendScholarshipApplicationToSheet } from "@/lib/google-sheets/scholarship-applications";
 
 export const runtime = "nodejs";
 
@@ -216,6 +217,14 @@ export async function POST(request: Request) {
 
     const applicationId = `SOL-${Date.now()}`;
 
+    await appendScholarshipSheetRow({
+      applicationId,
+      name,
+      email,
+      scholarship,
+      documents: documentResults,
+    });
+
     await notifyScholarshipTeam({
       applicationId,
       name,
@@ -278,5 +287,19 @@ async function notifyScholarshipTeam(input: {
     });
   } catch (error) {
     console.error("Scholarship notification email failed", error);
+  }
+}
+
+async function appendScholarshipSheetRow(input: {
+  applicationId: string;
+  name: string;
+  email: string;
+  scholarship: NonNullable<ReturnType<typeof findScholarship>>;
+  documents: SubmittedDocument[];
+}) {
+  try {
+    await appendScholarshipApplicationToSheet(input);
+  } catch (error) {
+    console.error("Scholarship Google Sheets append failed", error);
   }
 }

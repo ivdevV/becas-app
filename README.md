@@ -25,6 +25,10 @@ MAIL_USER=AKIAXXXXXXXXXXXXXXXX
 MAIL_PASSWORD="tu-password-smtp-de-aws-ses"
 MAIL_FROM="Becas IRG <no-reply@institutoraimongaja.com>"
 SCHOLARSHIP_NOTIFICATION_TO=becas.irg@institutoraimongaja.com
+GOOGLE_SHEETS_SPREADSHEET_ID=1L6Y8R_a2Tr4nSELipD5VSHd4c2rDL2uBkRgTbNJEoYA
+GOOGLE_SHEETS_SHEET_NAME="Hoja 1"
+GOOGLE_SERVICE_ACCOUNT_EMAIL=tu-service-account@tu-proyecto.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 ```
 
 El token debe coincidir con el parametro de sistema de Odoo `irg_student_scholarship_webhook.token`.
@@ -33,6 +37,10 @@ Si el token contiene `$`, escribelo como `\$` dentro de las comillas para que Ne
 Si `MAIL_HOST` esta configurado, cada solicitud recibida correctamente envia una notificacion a `SCHOLARSHIP_NOTIFICATION_TO` con los datos del solicitante, la beca seleccionada y el listado de documentos subidos. Para AWS SES, usa las credenciales SMTP generadas en SES, verifica el dominio o remitente de `MAIL_FROM`, y cambia `email-smtp.eu-west-1.amazonaws.com` por el endpoint de la region que corresponda si no usas Irlanda. Si no hay SMTP configurado, el formulario sigue funcionando y deja constancia en el log del servidor.
 
 En AWS SES, `MAIL_USER` debe ser el valor **SMTP Username** y `MAIL_PASSWORD` debe ser **SMTP Password**. No uses `AWS_ACCESS_KEY_ID` ni `AWS_SECRET_ACCESS_KEY`; SES SMTP los rechaza con `535 Authentication Credentials Invalid`.
+
+Si `GOOGLE_SHEETS_SPREADSHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL` y `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` estan configurados, cada solicitud aceptada por Odoo en `ODOO_MODE=prod` se registra en una fila de Google Sheets. Comparte la hoja con el email de la service account como editor. La pestaña usada por defecto es `Hoja 1`.
+
+La escritura en Google Sheets no bloquea la solicitud: si Odoo acepta la documentacion pero Google Sheets falla, el usuario ve la solicitud como recibida y el error queda registrado en los logs del servidor.
 
 ## Desarrollo
 
