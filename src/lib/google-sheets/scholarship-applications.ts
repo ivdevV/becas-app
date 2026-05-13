@@ -127,7 +127,23 @@ function normalizePrivateKey(value?: string) {
     }
   }
 
-  return key;
+  return canonicalizePemKey(key);
+}
+
+function canonicalizePemKey(value: string) {
+  const match = value.match(
+    /-----BEGIN ([A-Z ]*PRIVATE KEY)-----([\s\S]+?)-----END \1-----/,
+  );
+
+  if (!match) {
+    return value;
+  }
+
+  const label = match[1];
+  const body = match[2].replace(/[^A-Za-z0-9+/=]/g, "");
+  const lines = body.match(/.{1,64}/g) ?? [];
+
+  return [`-----BEGIN ${label}-----`, ...lines, `-----END ${label}-----`].join("\n");
 }
 
 function base64Url(input: string | Buffer) {
@@ -164,11 +180,18 @@ function createJwt(config: SheetsConfig) {
 }
 
 function getPrivateKeyDiagnostic(privateKey: string) {
+  const pemBody = privateKey
+    .replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----/g, "")
+    .replace(/-----END [A-Z ]*PRIVATE KEY-----/g, "")
+    .replace(/[^A-Za-z0-9+/=]/g, "");
+
   return [
     `hasBegin=${privateKey.includes("-----BEGIN PRIVATE KEY-----")}`,
     `hasEnd=${privateKey.includes("-----END PRIVATE KEY-----")}`,
     `lineCount=${privateKey.split("\n").length}`,
     `length=${privateKey.length}`,
+    `bodyLength=${pemBody.length}`,
+    `bodyMod4=${pemBody.length % 4}`,
   ].join(" ");
 }
 
