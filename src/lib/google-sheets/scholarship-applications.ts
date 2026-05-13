@@ -34,7 +34,7 @@ let cachedAccessToken: { token: string; expiresAt: number } | null = null;
 function getSheetsConfig(): SheetsConfig | null {
   const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const privateKey = normalizePrivateKey(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY);
 
   if (!spreadsheetId || !clientEmail || !privateKey) {
     return null;
@@ -46,6 +46,39 @@ function getSheetsConfig(): SheetsConfig | null {
     clientEmail,
     privateKey,
   };
+}
+
+function stripWrappingQuotes(value: string) {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
+}
+
+function normalizePrivateKey(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  let key = stripWrappingQuotes(value.trim()).replace(/\\n/g, "\n").trim();
+
+  if (!key.includes("BEGIN PRIVATE KEY")) {
+    try {
+      const decoded = Buffer.from(key, "base64").toString("utf8").trim();
+
+      if (decoded.includes("BEGIN PRIVATE KEY")) {
+        key = stripWrappingQuotes(decoded).replace(/\\n/g, "\n").trim();
+      }
+    } catch {
+      return key;
+    }
+  }
+
+  return key;
 }
 
 function base64Url(input: string | Buffer) {
