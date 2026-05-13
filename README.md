@@ -29,6 +29,8 @@ GOOGLE_SHEETS_SPREADSHEET_ID=tu-google-sheet-id
 GOOGLE_SHEETS_SHEET_NAME="Hoja 1"
 GOOGLE_SERVICE_ACCOUNT_EMAIL=tu-service-account@tu-proyecto.iam.gserviceaccount.com
 GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+# Alternativa: JSON completo de la service account en una sola linea o en base64.
+# GOOGLE_SERVICE_ACCOUNT_KEY_JSON='{"type":"service_account","client_email":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"}'
 ```
 
 El token debe coincidir con el parametro de sistema de Odoo `irg_student_scholarship_webhook.token`.
@@ -40,7 +42,7 @@ En AWS SES, `MAIL_USER` debe ser el valor **SMTP Username** y `MAIL_PASSWORD` de
 
 Si `GOOGLE_SHEETS_SPREADSHEET_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL` y `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` estan configurados, cada solicitud aceptada por Odoo en `ODOO_MODE=prod` se registra en una fila de Google Sheets. Comparte la hoja con el email de la service account como editor. La pestaña usada por defecto es `Hoja 1`.
 
-En produccion, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` debe contener la clave PEM de la service account. La app acepta la clave con saltos de linea reales, con `\n` escapados, con comillas envolventes o codificada en base64.
+En produccion, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` debe contener la clave PEM de la service account. La app acepta la clave con saltos de linea reales, con `\n` escapados, con comillas envolventes o codificada en base64. Tambien acepta `GOOGLE_SERVICE_ACCOUNT_KEY_JSON` con el JSON completo de la service account, directo o en base64; esta opcion suele ser la mas robusta si el panel de hosting altera las claves multilínea.
 
 La escritura en Google Sheets no bloquea la solicitud: si Odoo acepta la documentacion pero Google Sheets falla, el usuario ve la solicitud como recibida y el error queda registrado en los logs del servidor.
 
