@@ -1,4 +1,4 @@
-import { createSign } from "crypto";
+import { createPrivateKey, createSign } from "crypto";
 import type { Scholarship } from "@/lib/scholarships";
 import type { OdooWebhookResponse } from "@/lib/odoo/scholarship-webhook";
 
@@ -29,12 +29,22 @@ type SheetsConfig = {
   privateKey: string;
 };
 
+type GoogleServiceAccountKey = {
+  client_email?: string;
+  private_key?: string;
+};
+
 let cachedAccessToken: { token: string; expiresAt: number } | null = null;
 
 function getSheetsConfig(): SheetsConfig | null {
   const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
-  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = normalizePrivateKey(process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY);
+  const serviceAccountKey = parseServiceAccountKey(
+    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_JSON ?? process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY,
+  );
+  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ?? serviceAccountKey?.client_email;
+  const privateKey = normalizePrivateKey(
+    process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ?? serviceAccountKey?.private_key,
+  );
 
   if (!spreadsheetId || !clientEmail || !privateKey) {
     return null;
@@ -49,14 +59,50 @@ function getSheetsConfig(): SheetsConfig | null {
 }
 
 function stripWrappingQuotes(value: string) {
-  if (
-    (value.startsWith('"') && value.endsWith('"')) ||
-    (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
+  let output = value;
+
+  if (output.startsWith('"') || output.startsWith("'")) {
+    output = output.slice(1);
   }
 
-  return value;
+  if (output.endsWith('"') || output.endsWith("'")) {
+    output = output.slice(0, -1);
+  }
+
+  return output;
+}
+
+function parseServiceAccountKey(value?: string): GoogleServiceAccountKey | null {
+  if (!value) {
+    return null;
+  }
+
+  const normalizedValue = stripWrappingQuotes(value.trim()).trim();
+  const candidates = [normalizedValue];
+
+  try {
+    candidates.push(Buffer.from(normalizedValue, "base64").toString("utf8").trim());
+  } catch {
+    // Keep only the original value if it is not valid base64.
+  }
+
+  for (const candidate of candidates) {
+    if (!candidate.startsWith("{")) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(candidate) as GoogleServiceAccountKey;
+
+      if (parsed.private_key || parsed.client_email) {
+        return parsed;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
 }
 
 function normalizePrivateKey(value?: string) {
@@ -64,7 +110,10 @@ function normalizePrivateKey(value?: string) {
     return undefined;
   }
 
-  let key = stripWrappingQuotes(value.trim()).replace(/\\n/g, "\n").trim();
+  const serviceAccountKey = parseServiceAccountKey(value);
+  let key = stripWrappingQuotes((serviceAccountKey?.private_key ?? value).trim())
+    .replace(/\\n/g, "\n")
+    .trim();
 
   if (!key.includes("BEGIN PRIVATE KEY")) {
     try {
@@ -105,7 +154,22 @@ function createJwt(config: SheetsConfig) {
   signer.update(unsignedToken);
   signer.end();
 
-  return `${unsignedToken}.${base64Url(signer.sign(config.privateKey))}`;
+  try {
+    return `${unsignedToken}.${base64Url(signer.sign(createPrivateKey(config.privateKey)))}`;
+  } catch (error) {
+    throw new Error(
+      `Google Sheets private key is not a valid service account PEM key. ${getPrivateKeyDiagnostic(config.privateKey)} Original error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
+
+function getPrivateKeyDiagnostic(privateKey: string) {
+  return [
+    `hasBegin=${privateKey.includes("-----BEGIN PRIVATE KEY-----")}`,
+    `hasEnd=${privateKey.includes("-----END PRIVATE KEY-----")}`,
+    `lineCount=${privateKey.split("\n").length}`,
+    `length=${privateKey.length}`,
+  ].join(" ");
 }
 
 async function getAccessToken(config: SheetsConfig) {
