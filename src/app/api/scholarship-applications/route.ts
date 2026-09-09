@@ -10,9 +10,15 @@ import {
   type OdooWebhookResponse,
 } from "@/lib/odoo/scholarship-webhook";
 import { sendScholarshipApplicationNotification } from "@/lib/email/scholarship-notification";
-import { appendScholarshipApplicationToSheet } from "@/lib/google-sheets/scholarship-applications";
+import { authorizeScholarshipApplicationsRead } from "@/lib/api/read-authorization";
+import {
+  appendScholarshipApplicationToSheet,
+  listScholarshipApplicationsFromSheet,
+  SheetsPermissionError,
+} from "@/lib/google-sheets/scholarship-applications";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type SubmittedDocument = {
   documentId: string;
@@ -85,6 +91,68 @@ function getPublicSubmissionError(error: string, fallbackMessage: string) {
   }
 
   return fallbackMessage || "No se pudo enviar la solicitud. Intentalo de nuevo mas tarde.";
+}
+
+export async function GET(request: Request) {
+  const authorization = authorizeScholarshipApplicationsRead(request);
+
+  if (!authorization.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: authorization.message,
+      },
+      {
+        status: authorization.status,
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
+  }
+
+  try {
+    const applications = await listScholarshipApplicationsFromSheet();
+
+    if (!applications) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "Google Sheets no esta configurado.",
+        },
+        {
+          status: 503,
+          headers: { "Cache-Control": "no-store" },
+        },
+      );
+    }
+
+    return NextResponse.json(
+      {
+        ok: true,
+        count: applications.length,
+        applications,
+      },
+      {
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
+  } catch (error) {
+    console.error("Scholarship applications list failed", error);
+
+    const isPermissionError = error instanceof SheetsPermissionError;
+
+    return NextResponse.json(
+      {
+        ok: false,
+        message: isPermissionError
+          ? "La cuenta de servicio no tiene permiso para leer Google Sheets. Comparte la hoja con GOOGLE_SERVICE_ACCOUNT_EMAIL."
+          : "No se pudieron leer las solicitudes.",
+      },
+      {
+        status: isPermissionError ? 403 : 502,
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
+  }
 }
 
 export async function POST(request: Request) {
