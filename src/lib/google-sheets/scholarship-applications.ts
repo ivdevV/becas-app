@@ -1,6 +1,7 @@
 import { createPrivateKey, createSign } from "crypto";
 import type { Scholarship } from "@/lib/scholarships";
 import type { OdooWebhookResponse } from "@/lib/odoo/scholarship-webhook";
+import { parseScholarshipApplicationRows } from "./parse-sheet-rows";
 
 type UploadedDocument = {
   documentName: string;
@@ -51,11 +52,19 @@ function getSheetsConfig(): SheetsConfig | null {
   }
 
   return {
-    spreadsheetId,
-    sheetName: process.env.GOOGLE_SHEETS_SHEET_NAME ?? "Hoja 1",
+    spreadsheetId: normalizeEnvString(spreadsheetId) ?? spreadsheetId,
+    sheetName: normalizeEnvString(process.env.GOOGLE_SHEETS_SHEET_NAME) ?? "Hoja 1",
     clientEmail,
     privateKey,
   };
+}
+
+function normalizeEnvString(value?: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  return stripWrappingQuotes(value.trim()).trim();
 }
 
 function stripWrappingQuotes(value: string) {
@@ -280,4 +289,65 @@ export async function appendScholarshipApplicationToSheet(input: ScholarshipShee
   if (!response.ok) {
     throw new Error(`Google Sheets returned HTTP ${response.status}: ${await response.text()}`);
   }
+}
+
+type SheetValuesResponse = {
+  values?: Array<Array<string | number | boolean>>;
+};
+
+export class SheetsPermissionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SheetsPermissionError";
+  }
+}
+
+async function fetchSheetValues(config: SheetsConfig, token: string, range: string) {
+  const encodedRange = encodeURIComponent(range);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${config.spreadsheetId}/values/${encodedRange}`;
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return {
+    ok: response.ok,
+    status: response.status,
+    text: await response.text(),
+  };
+}
+
+export async function listScholarshipApplicationsFromSheet() {
+  const config = getSheetsConfig();
+
+  if (!config) {
+    return null;
+  }
+
+  const token = await getAccessToken(config);
+  const ranges = [`'${config.sheetName}'!A:K`, "A:K"];
+  let lastError = "Google Sheets returned an unknown error.";
+
+  for (const range of ranges) {
+    const response = await fetchSheetValues(config, token, range);
+
+    if (response.ok) {
+      const payload = JSON.parse(response.text) as SheetValuesResponse;
+      return parseScholarshipApplicationRows(payload.values ?? []).reverse();
+    }
+
+    lastError = `Google Sheets returned HTTP ${response.status}: ${response.text}`;
+
+    if (response.status === 403) {
+      throw new SheetsPermissionError(lastError);
+    }
+
+    if (response.status !== 400) {
+      break;
+    }
+  }
+
+  throw new Error(lastError);
 }
