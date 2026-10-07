@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
 import { PeriodDashboard } from "@/components/admin/PeriodDashboard";
 import { InstituteMark } from "@/components/institute-mark";
-import { getAdminConfig } from "@/lib/admin/config";
+import { readAdminConfigStatus } from "@/lib/admin/config";
 import { hasValidAdminSession } from "@/lib/admin/session";
 import { getPublicPeriodState, listPeriods } from "@/lib/scholarship-periods/repository";
 
@@ -39,20 +40,26 @@ type AdminPageProps = {
 };
 
 export default async function AdminPage({ searchParams }: AdminPageProps) {
+  await connection();
   const params = await searchParams;
   const error = lookupMessage(errorMessages, params.error);
   const notice = lookupMessage(noticeMessages, params.notice);
+  const adminConfig = readAdminConfigStatus();
 
-  if (!getAdminConfig()) {
+  if (!adminConfig.ok) {
     return (
       <main className="flex flex-1 items-center justify-center px-4 py-10">
         <section className="grid w-full max-w-xl justify-items-center gap-4 rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm sm:p-10">
           <InstituteMark />
           <p className="text-lg font-semibold uppercase text-[#1684bd]">Acceso interno</p>
           <h1 className="text-3xl font-semibold text-slate-950">Panel no disponible</h1>
-          <p className="text-sm leading-6 text-slate-600">
-            Define SCHOLARSHIP_ADMIN_PASSWORD, con al menos 12 caracteres, y SCHOLARSHIP_ADMIN_SESSION_SECRET, con al menos 32, en el entorno de Coolify.
-          </p>
+          <ul className="grid gap-3 text-left text-sm leading-6 text-slate-600">
+            {adminConfig.issues.map((issue) => (
+              <li key={issue.variable}>
+                <span className="font-medium text-slate-800">{issue.variable}.</span> {issue.message}
+              </li>
+            ))}
+          </ul>
         </section>
       </main>
     );
