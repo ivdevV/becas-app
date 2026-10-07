@@ -48,6 +48,23 @@ En produccion, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` debe contener la clave PEM d
 
 La escritura en Google Sheets no bloquea la solicitud: si Odoo acepta la documentacion pero Google Sheets falla, el usuario ve la solicitud como recibida y el error queda registrado en los logs del servidor.
 
+## Periodos de becas
+
+La pagina publica muestra el formulario solo cuando la convocatoria vigente esta abierta. Fuera de ese plazo muestra el aviso de periodo cerrado. El envio `POST /api/scholarship-applications` tambien se rechaza fuera de plazo.
+
+El panel interno esta en `/admin` y no se enlaza desde el formulario. Define estas variables en Coolify:
+
+```env
+SCHOLARSHIP_ADMIN_PASSWORD="una_clave_larga_de_administrador"
+SCHOLARSHIP_ADMIN_SESSION_SECRET="un_secreto_de_sesion_de_al_menos_32_caracteres"
+```
+
+La clave necesita al menos 12 caracteres y el secreto de sesion al menos 32. La sesion dura 8 horas, va en una cookie `httpOnly` y los intentos fallidos se limitan. La clave no se guarda en la base.
+
+Las convocatorias viven en `data/becas.sqlite`, incluido en el repositorio para el primer despliegue de Coolify. Ese archivo solo contiene periodos, no solicitudes ni secretos. La app necesita Node.js 22.13 o superior por `node:sqlite`.
+
+Para que los cambios del panel sobrevivan al siguiente despliegue, monta en Coolify un volumen persistente sobre la carpeta `data`. Un volumen vacio tapa el archivo de la imagen; en ese caso la app crea la base al arrancar. Si no hay volumen, cada despliegue vuelve a la copia del repositorio.
+
 ## Desarrollo
 
 ```bash

@@ -2,12 +2,15 @@
   "name": "becas-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test src/lib/google-sheets/parse-sheet-rows.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/google-sheets/parse-sheet-rows.test.ts src/lib/time/madrid.test.ts src/lib/admin/session-token.test.ts src/lib/admin/rate-limit.test.ts src/lib/admin/origin.test.ts src/lib/scholarship-periods/resolve.test.ts src/lib/scholarship-periods/repository.test.ts"
   },
   "dependencies": {
     "next": "16.2.6",
