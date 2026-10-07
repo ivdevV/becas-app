@@ -59,7 +59,7 @@ SCHOLARSHIP_ADMIN_PASSWORD="una_clave_larga_de_administrador"
 SCHOLARSHIP_ADMIN_SESSION_SECRET="un_secreto_de_sesion_de_al_menos_32_caracteres"
 ```
 
-La clave necesita al menos 12 caracteres y el secreto de sesion al menos 32. La sesion dura 8 horas, va en una cookie `httpOnly` y los intentos fallidos se limitan. La clave no se guarda en la base.
+La clave necesita al menos 12 caracteres y el secreto de sesion al menos 32. En Coolify marca las dos como disponibles en runtime y reinicia. Si el valor contiene `$`, escribelo como `$$`; si no, Coolify lo recorta y el panel sigue cerrado. La sesion dura 8 horas, va en una cookie `httpOnly` y los intentos fallidos se limitan. La clave no se guarda en la base.
 
 Las convocatorias viven en `data/becas.sqlite`, incluido en el repositorio para el primer despliegue de Coolify. Ese archivo solo contiene periodos, no solicitudes ni secretos. La app necesita Node.js 22.13 o superior por `node:sqlite`.
 
