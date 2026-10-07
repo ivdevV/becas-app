@@ -16,6 +16,7 @@ import {
   listScholarshipApplicationsFromSheet,
   SheetsPermissionError,
 } from "@/lib/google-sheets/scholarship-applications";
+import { getPublicPeriodState } from "@/lib/scholarship-periods/repository";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -156,6 +157,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (getPublicPeriodState().status !== "open") {
+    return badRequest("El periodo para solicitar becas ha finalizado. Disculpad las molestias.", 403);
+  }
+
   const formData = await request.formData();
   const name = getText(formData, "name");
   const email = getText(formData, "email").toLowerCase();

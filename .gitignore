@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# sqlite runtime sidecars; the database itself stays in the repo for Coolify
+data/*.sqlite-journal
+data/*.sqlite-wal
+data/*.sqlite-shm
