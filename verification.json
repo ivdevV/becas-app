@@ -1,0 +1,89 @@
+{
+  "status": "passed",
+  "environment": {
+    "runtime": "node v22.23.4 / npm 10.9.9",
+    "database": "sqlite temporal de los tests (SCHOLARSHIP_DB_PATH); data/becas.sqlite del repo no se usa ni se modifica",
+    "base_commit": "ba8987a7c20052f4128422f64776ab2589d5e606"
+  },
+  "model_tier_used": "grok-4.7",
+  "escalations": [],
+  "checks": [
+    {
+      "name": "node_runtime",
+      "command": "node -v && npm -v",
+      "result": "pass",
+      "detail": "Node v22.23.4, coincide con el runtime esperado. npm 10.9.9. Códigos 0.",
+      "evidence": "artifacts/validation-10.0.10/node-runtime.txt"
+    },
+    {
+      "name": "npm_ci",
+      "command": "npm ci",
+      "result": "pass",
+      "detail": "Instalación limpia correcta: added 368 packages, and audited 369 packages, código 0. npm ci informó 6 vulnerabilities (1 low, 1 moderate, 4 high). No se ejecutó npm audit fix.",
+      "evidence": "artifacts/validation-10.0.10/npm-ci.txt"
+    },
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "result": "pass",
+      "detail": "eslint terminó sin errores, código 0.",
+      "evidence": "artifacts/validation-10.0.10/lint.txt"
+    },
+    {
+      "name": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "pass",
+      "detail": "tsc --noEmit terminó con código 0 y sin diagnósticos.",
+      "evidence": "artifacts/validation-10.0.10/typecheck.txt"
+    },
+    {
+      "name": "test",
+      "command": "npm test",
+      "result": "pass",
+      "detail": "20 pruebas, 20 pass, 0 fail, 0 skipped, código 0. Los tests de periodos usan SCHOLARSHIP_DB_PATH en un sqlite temporal.",
+      "evidence": "artifacts/validation-10.0.10/test.txt"
+    },
+    {
+      "name": "build",
+      "command": "npm run build",
+      "result": "pass",
+      "detail": "next build imprimió Next.js 16.4.3 (Turbopack), compiló y generó las páginas, código 0.",
+      "evidence": "artifacts/validation-10.0.10/build.txt"
+    },
+    {
+      "name": "versions_sharp_nodemailer",
+      "command": "fs.readFileSync + JSON.parse de package.json, node_modules/sharp/package.json, node_modules/next/package.json, node_modules/nodemailer/package.json y package-lock.json; require('sharp')",
+      "result": "pass",
+      "detail": "package.json dependencies.next=16.4.3, devDependencies.eslint-config-next=16.4.3, dependencies.nodemailer=\"10.0.10\" exacto (no es un rango). Lockfile packages['node_modules/nodemailer'].version=10.0.10. Instalados: next 16.4.3, nodemailer 10.0.10, sharp 0.35.5 (>= 0.35.5). sharp/package.json se leyó con fs.readFileSync. require('sharp') es function.",
+      "evidence": "artifacts/validation-10.0.10/versions-sharp-nodemailer.txt"
+    },
+    {
+      "name": "npm_audit_before",
+      "command": "npm audit (árbol nodemailer 10.0.6)",
+      "result": "skipped",
+      "detail": "No reejecutado porque exigiría revertir el lockfile; artifacts/npm-audit-before-10.0.10.txt muestra nodemailer moderate con GHSA-g57g-f23g-4646 y GHSA-39m8-27wv-hr27.",
+      "evidence": "artifacts/npm-audit-before-10.0.10.txt"
+    },
+    {
+      "name": "npm_audit_after",
+      "command": "npm audit",
+      "result": "pass",
+      "detail": "El comando salió con código 1 por avisos ajenos; ese código no invalida el check y no se ejecutó npm audit fix. Recuento: 6 vulnerabilities (1 low, 1 moderate, 4 high). El informe no menciona nodemailer, GHSA-g57g-f23g-4646 ni GHSA-39m8-27wv-hr27. Low: @babel/core. Moderate: baseline-browser-mapping. High: brace-expansion, browserslist, js-yaml, source-map-js.",
+      "evidence": "artifacts/validation-10.0.10/npm-audit-after.txt"
+    },
+    {
+      "name": "e2e_testsprite",
+      "command": "git rev-parse 2424b12 && git diff --name-only 2424b12 -- . && git status --short",
+      "result": "skipped",
+      "detail": "El diff no toca superficie web; solo el pin de nodemailer, el test de pines, y artefactos de misión. TestSprite no se ejecuta. Padre 2424b127fbb6a2174311f37396dd9014b4aba6b1. Rutas: execution.md, package-lock.json, package.json, plan.md, src/lib/runtime/security-pins.test.ts, verification.json y artifacts/. Ninguna está en src/app, src/components, public ni en controladores.",
+      "evidence": "artifacts/validation-10.0.10/git-diff-status.txt"
+    },
+    {
+      "name": "cleanup_sqlite",
+      "command": "git status --short -- data/becas.sqlite",
+      "result": "pass",
+      "detail": "Salida vacía y código 0. data/becas.sqlite está trackeado, no está ignorado y no aparece modificado después de npm test y npm run build.",
+      "evidence": "artifacts/validation-10.0.10/cleanup-sqlite.txt"
+    }
+  ]
+}

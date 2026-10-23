@@ -1,0 +1,37 @@
+=== git diff --name-only main -- . ===
+package-lock.json
+package.json
+=== git status --short ===
+ M package-lock.json
+ M package.json
+?? .nvmrc
+?? artifacts/
+?? execution.md
+?? plan.md
+?? src/lib/runtime/
+=== git diff --name-only HEAD -- . ===
+package-lock.json
+package.json
+=== untracked relevant ===
+.nvmrc
+artifacts/build.txt
+artifacts/green-security-pins.txt
+artifacts/lint.txt
+artifacts/npm-audit-summary.txt
+artifacts/npm-ci.txt
+artifacts/red-security-pins.txt
+artifacts/test.txt
+artifacts/typecheck.txt
+artifacts/validation/build.txt
+artifacts/validation/git-diff-status.txt
+artifacts/validation/lint.txt
+artifacts/validation/node-runtime.txt
+artifacts/validation/npm-ci.txt
+artifacts/validation/sharp-and-versions.txt
+artifacts/validation/test.txt
+artifacts/validation/typecheck.txt
+artifacts/version-registry.json
+execution.md
+plan.md
+src/lib/runtime/security-pins.test.ts
+EXIT:0

@@ -1,0 +1,8 @@
+command: npm run lint
+started: 2026-10-23T19:09:19Z
+
+> becas-app@0.1.0 lint
+> eslint
+
+exit:0
+finished: 2026-10-23T19:09:20Z

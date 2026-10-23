@@ -1,0 +1,7 @@
+command: node -v && npm -v
+started: 2026-10-23T19:09:04Z
+v22.23.4
+node_exit:0
+10.9.9
+npm_exit:0
+finished: 2026-10-23T19:09:04Z

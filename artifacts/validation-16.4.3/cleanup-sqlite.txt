@@ -1,0 +1,10 @@
+command: git status --short -- data/becas.sqlite
+started: 2026-10-23T19:09:59Z
+--- git status --short -- data/becas.sqlite ---
+status_exit:0
+status_output_empty: yes
+--- ls-files ---
+data/becas.sqlite
+--- check-ignore ---
+not ignored
+finished: 2026-10-23T19:09:59Z

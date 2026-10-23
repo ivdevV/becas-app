@@ -1,0 +1,172 @@
+# Plan — actualización de seguridad Next.js 16.4.1 y Node.js 22.23.4
+
+## Clasificación
+
+- Clasificación: **full**. Cambia dependencias de runtime, el lockfile, la versión de Node y la configuración que el despliegue puede leer (`engines`). Afecta a seguridad y cruza varios archivos. No es una edición puntual de un solo archivo.
+- Tier: **standard**. Hay dependencia de seguridad y configuración de versión de despliegue. No hay migraciones, secretos nuevos, cambios de autenticación ni borrado de datos.
+
+## Rama base
+
+No existe una rama `dev`, `develop`, `test` ni `staging`. Las ramas remotas son `main` y `feat/google-sheets-scholarship-log`. `origin/HEAD` apunta a `origin/main`.
+
+Se parte de la rama por defecto `main`, commit `ba8987a7c20052f4128422f64776ab2589d5e606`. El trabajo vive solo en `cursor/next-16-4-1-security-fff1`. No se hace push a `main` ni a ninguna rama que despliegue, no se fusiona y no se despliega.
+
+## Alcance
+
+Incluido:
+
+- Subir `next` y `eslint-config-next` a `16.4.1` exacto.
+- Dejar en el lockfile todos los paquetes `@next/*` en `16.4.1` (entran como dependencias de `next` y de `eslint-config-next`; no hay `@next/*` directos en `package.json`).
+- Asegurar `sharp` >= `0.35.5` resuelto en el lockfile. `next@16.4.1` lo declara como dependencia opcional `sharp: ^0.35.5`. No se añade dependencia directa si el lockfile ya resuelve `0.35.5` o superior.
+- Crear `.nvmrc` con `22.23.4`.
+- Fijar `engines.node` a `22.23.4` (hoy está en `>=22.13.0`).
+- Añadir un test de pines que falle antes del cambio y pase después.
+- Corregir de forma mínima cualquier rotura de API que aparezca en lint, typecheck, build o tests.
+- Documentar uso, configuración, pruebas, limitaciones y un `CHANGELOG.md` (el repositorio no tenía changelog).
+
+Fuera de alcance:
+
+- No se sube a `next@16.4.3` (`latest` en npm el 23/10/2026). El encargo fija `16.4.1`.
+- No se crea Dockerfile, `nixpacks.toml` ni configuración Railpack: no existen y crearlos cambiaría el modo de despliegue de Coolify.
+- No se activa `images.dangerouslyAllowSVG`.
+- No se modifica la lógica de las Server Actions ni la autenticación del panel.
+- No se escriben pruebas de explotación de las CVE.
+
+## Versiones comprobadas antes de fijar
+
+Comprobado el 23/10/2026, antes de editar dependencias:
+
+| Pieza | Pedida | Registro | Resultado |
+| --- | --- | --- | --- |
+| `next` | 16.4.1 | `npm view next@16.4.1 version` | Existe. `latest` del registro ese día es 16.4.3; se respeta 16.4.1. |
+| `eslint-config-next` | 16.4.1 | `npm view eslint-config-next@16.4.1 version` | Existe. |
+| `@next/env`, `@next/eslint-plugin-next`, `@next/swc-linux-x64-gnu` | 16.4.1 | `npm view <pkg>@16.4.1 version` | Existen. `next@16.4.1` depende de `@next/env@16.4.1` y de los binarios `@next/swc-*@16.4.1`. |
+| `sharp` | >= 0.35.5 | `npm view sharp versions` | `0.35.5` es la única versión publicada que cumple. `next@16.4.1` declara `optionalDependencies.sharp = ^0.35.5`. |
+| Node.js | 22.23.4 | `https://nodejs.org/dist/index.json` y la nota de release | Existe. Índice: `v22.23.4`, fecha `2026-10-20`, `lts: Jod`, `security: true`. Nota de release: 2026-10-21, versión de seguridad. También existe `v24.22.1`; esta app se queda en la línea 22. |
+
+El runtime local de esta sesión ya es Node `v22.23.4` y npm `10.9.9`.
+
+Estado de partida en `main`:
+
+- `next` y `eslint-config-next`: `16.2.6`.
+- `@next/env`, `@next/eslint-plugin-next` y `@next/swc-*` en el lockfile: `16.2.6`.
+- `sharp` resuelto: `0.34.5` (por debajo de la mitigación).
+- `engines.node`: `>=22.13.0`.
+- No hay `.nvmrc`, Dockerfile, `nixpacks.toml` ni Railpack.
+
+## Auditoría de código (antes del cambio)
+
+- Server Actions: sí. `src/app/admin/actions.ts` empieza con `"use server"` y exporta `loginAction`, `logoutAction`, `createPeriodAction`, `updatePeriodAction`, `setCurrentPeriodAction` y el borrado de periodos. La app es App Router, así que GHSA-p3m5-59mp-jv5r (DoS por Server Actions) aplica al código actual. La corrección es subir Next.js; no hay workaround de aplicación que este plan vaya a implementar.
+- Cache Components / `'use cache'`: no hay ninguna coincidencia en `src/`. GHSA-673q-mjm6-r5xr (RCE en funciones `use cache` que devuelven varios typed arrays) no tiene un punto de uso en este repositorio. El aviso de Next.js pide actualizar igualmente.
+- `images` en `next.config.ts`: no hay clave `images`. Por tanto no están definidos `dangerouslyAllowSVG`, `remotePatterns` ni `unoptimized`. El valor por defecto de `dangerouslyAllowSVG` permanece desactivado y el optimizador sigue activo para los formatos que Next acepta.
+- `next/image`: dos usos, ambos con el AVIF local `/7cc4845ce8a62d935d2dd0db23209c3ca8d5463f-587x282.avif` (`src/components/institute-mark.tsx` y `src/components/scholarship-form/ScholarshipApplicationForm.tsx`). No hay SVG en esas fuentes.
+- `public/` contiene SVG de plantilla (`file.svg`, `globe.svg`, `next.svg`, `vercel.svg`, `window.svg`) que el código de `src/` no referencia. No se eliminan: quedan fuera del alcance. Servirlos como estáticos no pasa por `sharp`; el riesgo de CVE-2026-96889 es el optimizador de imágenes cuando procesa SVG.
+
+## Revisión de seguridad previa
+
+[YES] Reason: Las versiones objetivo existen en npm y en nodejs.org. El cambio solo eleva Next.js y los paquetes `@next/*` emparejados a 16.4.1, resuelve `sharp` >= 0.35.5 y fija Node.js 22.23.4 en `.nvmrc` y `engines`. No introduce secretos, no debilita la autenticación del panel, no toca migraciones ni borra datos históricos, y no activa `dangerouslyAllowSVG`. Los controles de las Server Actions siguen en el servidor (origen, límite de intentos, contraseña y sesión). No se crea un Dockerfile ni una config de Nixpacks/Railpack, para no cambiar el modo de despliegue de Coolify.
+
+## Criterios de aceptación
+
+1. `package.json` declara `next` y `eslint-config-next` en `16.4.1`, y `engines.node` en `22.23.4`.
+2. `.nvmrc` contiene `22.23.4`.
+3. El lockfile resuelve `sharp` >= `0.35.5` y cada `@next/*` en `16.4.1`.
+4. `npm ci`, `npm run lint`, `npx tsc --noEmit`, `npm test` y `npm run build` terminan con código 0. No hay script `typecheck`; el chequeo de tipos es `tsc --noEmit` según `tsconfig.json` (`noEmit: true`).
+5. Si algún chequeo falla por una rotura de API, la corrección es mínima y se vuelve a ejecutar el ciclo.
+6. `verification.json` refleja solo comandos ejecutados.
+
+## Riesgos
+
+- Coolify no tiene Dockerfile ni Nixpacks en el repo. `.nvmrc` y `engines` documentan el pin, pero el proceso que ya está desplegado no cambia hasta un despliegue futuro, y este encargo prohíbe desplegar. Si el proveedor de build de Coolify aún no ofrece Node 22.23.4, el siguiente despliegue puede fallar al resolver la versión exacta. Es preferible ese fallo visible a seguir en una versión de Node sin los parches del 21/10/2026.
+- `engines` exacto `22.23.4` rechaza, a efectos de aviso de npm, cualquier otro Node. La release 22 más nueva publicada en el índice el 23/10/2026 es precisamente 22.23.4.
+- Las Server Actions siguen existiendo. El DoS queda corregido solo en la medida en que el runtime desplegado use Next 16.4.1.
+- No hay `'use cache'`, pero el aviso de Next pide el parche igualmente: 16.4.1 lo incluye.
+- El optimizador de imágenes sigue activo (no se pone `unoptimized`). La mitigación de CVE-2026-96889 es Next 16.4.1 más `sharp` >= 0.35.5, no desactivar el optimizador. Los SVG de `public/` no se pasan a `next/image`.
+- `sharp` es dependencia opcional. En Linux glibc debe instalarse de verdad; si `npm ci` la omite, el criterio de aceptación no se cumple y hay que fijarla de forma directa.
+
+## Pruebas y TDD
+
+TDD viable para los pines: un test de Node (`src/lib/runtime/security-pins.test.ts`) lee `package.json`, `.nvmrc` y `package-lock.json`. Se ejecuta en rojo contra el estado 16.2.6 / sharp 0.34.5 / sin `.nvmrc`, y en verde después del bump. No se escribe un exploit de las CVE; la alternativa para la compatibilidad de API es la suite ya existente más lint, `tsc --noEmit` y `build`.
+
+E2E TestSprite: no se dispara con el alcance previsto. El diff no debe tocar vistas, plantillas, assets estáticos ni controladores HTTP. Si una rotura de API obligara a editar esa superficie, la E2E pasaría a ser obligatoria y se ejecutaría solo tras el resto de chequeos en verde, contra runtime local. Si no hace falta tocarla, `e2e_testsprite` queda `skipped` con esa justificación de alcance.
+
+Los tests de periodos usan una sqlite temporal (`SCHOLARSHIP_DB_PATH`) y la borran en `test.after`. No se escribe en `data/becas.sqlite`.
+
+## Publicación autorizada
+
+El usuario autorizó el 23/10/2026 una sola PR desde `cursor/next-16-4-1-security-fff1` hacia `main`, y el push a esa rama propia. Sigue prohibido fusionar, hacer push a ramas que despliegan y desplegar. Si `verification.json` no queda en `passed`, la PR se abre como borrador y se dice en la descripción.
+
+## Encargo 2 (23/10/2026) — Next 16.4.3 y nodemailer
+
+Misma rama y misma PR #8. Clasificación: **full**. Tier: **standard** (dependencias de seguridad; el salto de nodemailer es de major).
+
+### Alcance
+
+- Subir `next`, `eslint-config-next` y los `@next/*` del lockfile a `16.4.3`, comprobado en npm antes de fijarlo (`npm view` devuelve `16.4.3` para `next`, `eslint-config-next` y `@next/env`). `next@16.4.3` sigue pidiendo `sharp@^0.35.5`.
+- Subir `nodemailer` de `8.0.7` a la primera versión que cierra todos los avisos **high**.
+- Repetir `npm ci`, lint, `tsc --noEmit`, tests, build y `npm audit` antes y después.
+- Actualizar `verification.json`, `CHANGELOG.md` y la descripción de la PR #8.
+- Push solo a `cursor/next-16-4-1-security-fff1`. No fusionar ni desplegar.
+
+### nodemailer: primera versión que quita el high
+
+`npm audit` marca el paquete como high con rango agregado `<=10.0.9`. Los avisos high y su primera versión parcheada, según GitHub Advisory:
+
+| Aviso | Severidad | Primera parcheada |
+| --- | --- | --- |
+| GHSA-r7g4-qg5f-qqm2 | high | 8.0.8 |
+| GHSA-p6gq-j5cr-w38f | high | 9.0.1 |
+| GHSA-2x7j-588g-ccc2 | high | 9.1.0 |
+| GHSA-v53p-9fqp-m79j | high | 10.0.6 |
+
+La primera versión que cierra todos los high es **10.0.6**. Se fija exacta, no `^10.0.6` ni `10.2.1` (eso es lo que propone `npm audit fix`, e incluye cambios posteriores). Queda un aviso moderate, GHSA-39m8-27wv-hr27, parcheado en 10.0.10. Este encargo pide el high, no ese moderate.
+
+### API del major
+
+Hay cambio de major (8 → 10) con rupturas publicadas:
+
+- 9.0.0 valida por defecto el TLS al descargar contenido remoto, pedir tokens OAuth2 o abrir un proxy HTTP. El envío de becas no usa adjuntos remotos, OAuth2 ni proxy.
+- 10.0.0 exige Node.js 20 o superior. El repo ya fija 22.23.4.
+
+`createTransport({ host, port, secure, auth })` y `sendMail({ from, to, replyTo, subject, text, html })` no están en esas rupturas. No se adapta `src/lib/email/scholarship-notification.ts`. No se pone `tls.rejectUnauthorized=false`.
+
+Si al instalar 10.0.6 el test de esa forma de llamada falla, o `tsc` exige reescribir el envío, se revierte nodemailer y se explica sin forzar el salto. Un ajuste de tipos de desarrollo (`@types/nodemailer`) sí cabe si el paquete ya trae los suyos.
+
+### Revisión de seguridad
+
+[YES] Reason: 16.4.3 y nodemailer 10.0.6 existen en npm. El cambio solo sube dependencias ya parcheadas. No debilita TLS, no toca la autenticación del panel, no añade secretos y no modifica la función de envío. Node 22.23.4 cumple el requisito de nodemailer 10. `sharp` se mantiene en >= 0.35.5.
+
+### TDD y E2E
+
+El test de pines pasa a exigir Next 16.4.3 y nodemailer 10.0.6: rojo contra el árbol actual, verde después del install. Un test de `jsonTransport` cubre la forma de `sendMail` que usa la app y debe seguir en verde antes y después; si pasa a rojo, la API rompió y se detiene nodemailer. No hay exploit de las CVE.
+
+E2E TestSprite: el diff previsto no toca vistas, plantillas, assets ni controladores. `e2e_testsprite` queda `skipped` con esa justificación. Si hubiera que editar `src/app` o componentes para una rotura, la E2E pasaría a ser obligatoria.
+
+## Encargo 3 (23/10/2026) — nodemailer 10.0.10
+
+Misma rama `cursor/next-16-4-1-security-fff1` y misma PR #8. Clasificación: **full**. Tier: **standard** (dependencia de seguridad).
+
+### Comprobación previa
+
+- `npm view nodemailer@10.0.10 version` devuelve `10.0.10`.
+- GHSA-g57g-f23g-4646 (medium): rango `>= 9.1.0, < 10.0.9`, primera parcheada `10.0.9`. 10.0.10 queda fuera del rango.
+- GHSA-39m8-27wv-hr27 (medium, CVE-2026-110871): rango `>= 3.0.0, <= 10.0.9`, primera parcheada `10.0.10`. 10.0.10 lo cierra.
+- El changelog de 10.0.7 a 10.0.10 solo tiene bug fixes (addressparser, DKIM, MIME, pool SMTP). No hay ruptura publicada. El contrato de envío no debe cambiar.
+
+### Alcance
+
+- Fijar `nodemailer` en `10.0.10` exacto en `package.json` y en el lockfile.
+- Mantener `next` y `eslint-config-next` en `16.4.3`, `@next/*` en `16.4.3` y `sharp` en `0.35.5`.
+- Mantener `src/lib/email/nodemailer-api.test.ts` sin red (`jsonTransport`).
+- No editar `scholarship-notification.ts` salvo que 10.0.10 rompa el contrato, `tsc` o el build. Si rompe, se revierte nodemailer y se explica. No se fuerza.
+- Repetir lint, `tsc --noEmit`, tests, build y `npm audit`.
+- Actualizar `verification.json`, `CHANGELOG.md` y la descripción de la PR #8.
+- Commit y push solo a `cursor/next-16-4-1-security-fff1`. No fusionar ni desplegar.
+
+### Revisión de seguridad
+
+[YES] Reason: 10.0.10 existe y es la primera versión que cierra a la vez GHSA-g57g-f23g-4646 y GHSA-39m8-27wv-hr27. El salto desde 10.0.6 es de parche, sin ruptura de API publicada y sin tocar autenticación, secretos, TLS ni el código de envío. Next permanece en 16.4.3 y sharp en 0.35.5.
+
+### TDD y E2E
+
+El test de pines pasa a exigir nodemailer `10.0.10`: rojo contra 10.0.6, verde después. El test de `jsonTransport` se ejecuta en verde antes y tiene que seguir en verde después; si falla, se detiene el salto. E2E TestSprite queda `skipped` si el diff no toca superficie web.

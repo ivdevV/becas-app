@@ -1,0 +1,10 @@
+npm audit ANTES de next 16.4.3 y nodemailer 10.0.6
+metadata {"info":0,"low":1,"moderate":1,"high":5,"critical":0,"total":7}
+
+low @babel/core range=<=7.29.0
+moderate baseline-browser-mapping range=>=2.0.0 <2.11.0
+high brace-expansion range=<=1.1.20 || 3.0.0 - 5.0.11
+high browserslist range=<=4.28.6
+high js-yaml range=4.0.0 - 4.3.1
+high nodemailer range=<=10.0.9
+high source-map-js range=1.0.0 - 1.2.1

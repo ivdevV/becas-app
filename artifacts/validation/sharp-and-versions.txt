@@ -1,0 +1,12 @@
+{
+  "sharpVersion": "0.35.5",
+  "sharpGte0355": true,
+  "next": "16.4.1",
+  "nextIs1641": true,
+  "eslintConfigNext": "16.4.1",
+  "eslintConfigNextIs1641": true,
+  "sharpType": "function",
+  "sharpIsFunction": true,
+  "pass": true
+}
+EXIT:0

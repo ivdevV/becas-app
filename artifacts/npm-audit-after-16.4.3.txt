@@ -1,0 +1,14 @@
+npm audit DESPUES de next 16.4.3 y nodemailer 10.0.6
+metadata {"info":0,"low":1,"moderate":2,"high":4,"critical":0,"total":7}
+
+low @babel/core range=<=7.29.0
+moderate baseline-browser-mapping range=>=2.0.0 <2.11.0
+high brace-expansion range=<=1.1.20 || 3.0.0 - 5.0.11
+high browserslist range=<=4.28.6
+high js-yaml range=4.0.0 - 4.3.1
+moderate nodemailer range=3.0.0 - 10.0.9
+high source-map-js range=1.0.0 - 1.2.1
+
+nodemailer severity=moderate
+ via moderate Nodemailer: Quoted local-part can produce malformed envelope recipient through RFC 5322 comment parsing range=>=9.1.0 <10.0.9
+ via moderate Nodemailer: Quadratic (O(n^2)) DKIM header unfolding lets a large folded header cause remote denial of service during signing range=>=3.0.0 <=10.0.9

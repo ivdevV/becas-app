@@ -1,0 +1,10 @@
+npm audit tras next@16.4.1 (23/10/2026). metadata: 0 critical, 5 high, 1 moderate, 1 low.
+
+No aparecen next, sharp ni los GHSA de este encargo.
+
+- high nodemailer <=10.0.9 (dependencia directa ^8.0.7): varias CVE de cabeceras, SSRF y DoS. Fuera de alcance; no se fuerza un salto de major.
+- high brace-expansion, browserslist, js-yaml, source-map-js: transitivas de herramientas.
+- moderate baseline-browser-mapping >=2.0.0 <2.11.0: dependencia de next@16.4.1 (^2.9.19).
+- low @babel/core <=7.29.0.
+
+No se ejecutó npm audit fix ni npm audit fix --force.
