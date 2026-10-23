@@ -156,3 +156,12 @@ Rol distinto. No tocó código de producción. Reescribió `verification.json` c
 - Contrato `jsonTransport` en 10.0.10: código 0 (`artifacts/nodemailer-api-after-10.0.10.txt`).
 - Pines 5/5. `npm ci` 0, lint 0, `tsc --noEmit` 0, `npm test` 20/20, `npm run build` 0 (Next.js 16.4.3).
 - `npm audit` después: código 1 por avisos restantes; 4 high, 1 moderate, 1 low. nodemailer ya no aparece. Evidencia `artifacts/npm-audit-after-10.0.10.txt`.
+
+### Review y validación
+
+- Review de código, rol distinto: VEREDICTO APROBADO. Sin bloqueos.
+- Validación independiente: `verification.json` status passed. Evidencia en `artifacts/validation-10.0.10/`. `npm_audit_before` skipped (el informe de 10.0.6 ya estaba capturado). `npm_audit_after` ejecutado por el validador: nodemailer ausente. `e2e_testsprite` skipped: el diff no toca superficie web.
+
+### Documentación
+
+`CHANGELOG.md` añade la entrada de nodemailer 10.0.10. La PR #8 se actualiza tras el push.
