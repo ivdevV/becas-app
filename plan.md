@@ -95,3 +95,49 @@ Los tests de periodos usan una sqlite temporal (`SCHOLARSHIP_DB_PATH`) y la borr
 ## Publicación autorizada
 
 El usuario autorizó el 23/10/2026 una sola PR desde `cursor/next-16-4-1-security-fff1` hacia `main`, y el push a esa rama propia. Sigue prohibido fusionar, hacer push a ramas que despliegan y desplegar. Si `verification.json` no queda en `passed`, la PR se abre como borrador y se dice en la descripción.
+
+## Encargo 2 (23/10/2026) — Next 16.4.3 y nodemailer
+
+Misma rama y misma PR #8. Clasificación: **full**. Tier: **standard** (dependencias de seguridad; el salto de nodemailer es de major).
+
+### Alcance
+
+- Subir `next`, `eslint-config-next` y los `@next/*` del lockfile a `16.4.3`, comprobado en npm antes de fijarlo (`npm view` devuelve `16.4.3` para `next`, `eslint-config-next` y `@next/env`). `next@16.4.3` sigue pidiendo `sharp@^0.35.5`.
+- Subir `nodemailer` de `8.0.7` a la primera versión que cierra todos los avisos **high**.
+- Repetir `npm ci`, lint, `tsc --noEmit`, tests, build y `npm audit` antes y después.
+- Actualizar `verification.json`, `CHANGELOG.md` y la descripción de la PR #8.
+- Push solo a `cursor/next-16-4-1-security-fff1`. No fusionar ni desplegar.
+
+### nodemailer: primera versión que quita el high
+
+`npm audit` marca el paquete como high con rango agregado `<=10.0.9`. Los avisos high y su primera versión parcheada, según GitHub Advisory:
+
+| Aviso | Severidad | Primera parcheada |
+| --- | --- | --- |
+| GHSA-r7g4-qg5f-qqm2 | high | 8.0.8 |
+| GHSA-p6gq-j5cr-w38f | high | 9.0.1 |
+| GHSA-2x7j-588g-ccc2 | high | 9.1.0 |
+| GHSA-v53p-9fqp-m79j | high | 10.0.6 |
+
+La primera versión que cierra todos los high es **10.0.6**. Se fija exacta, no `^10.0.6` ni `10.2.1` (eso es lo que propone `npm audit fix`, e incluye cambios posteriores). Queda un aviso moderate, GHSA-39m8-27wv-hr27, parcheado en 10.0.10. Este encargo pide el high, no ese moderate.
+
+### API del major
+
+Hay cambio de major (8 → 10) con rupturas publicadas:
+
+- 9.0.0 valida por defecto el TLS al descargar contenido remoto, pedir tokens OAuth2 o abrir un proxy HTTP. El envío de becas no usa adjuntos remotos, OAuth2 ni proxy.
+- 10.0.0 exige Node.js 20 o superior. El repo ya fija 22.23.4.
+
+`createTransport({ host, port, secure, auth })` y `sendMail({ from, to, replyTo, subject, text, html })` no están en esas rupturas. No se adapta `src/lib/email/scholarship-notification.ts`. No se pone `tls.rejectUnauthorized=false`.
+
+Si al instalar 10.0.6 el test de esa forma de llamada falla, o `tsc` exige reescribir el envío, se revierte nodemailer y se explica sin forzar el salto. Un ajuste de tipos de desarrollo (`@types/nodemailer`) sí cabe si el paquete ya trae los suyos.
+
+### Revisión de seguridad
+
+[YES] Reason: 16.4.3 y nodemailer 10.0.6 existen en npm. El cambio solo sube dependencias ya parcheadas. No debilita TLS, no toca la autenticación del panel, no añade secretos y no modifica la función de envío. Node 22.23.4 cumple el requisito de nodemailer 10. `sharp` se mantiene en >= 0.35.5.
+
+### TDD y E2E
+
+El test de pines pasa a exigir Next 16.4.3 y nodemailer 10.0.6: rojo contra el árbol actual, verde después del install. Un test de `jsonTransport` cubre la forma de `sendMail` que usa la app y debe seguir en verde antes y después; si pasa a rojo, la API rompió y se detiene nodemailer. No hay exploit de las CVE.
+
+E2E TestSprite: el diff previsto no toca vistas, plantillas, assets ni controladores. `e2e_testsprite` queda `skipped` con esa justificación. Si hubiera que editar `src/app` o componentes para una rotura, la E2E pasaría a ser obligatoria.

@@ -12,64 +12,78 @@
       "name": "node_runtime",
       "command": "node -v && npm -v",
       "result": "pass",
-      "detail": "Node v22.23.4, coincide con el runtime esperado. npm 10.9.9.",
-      "evidence": "artifacts/validation/node-runtime.txt"
+      "detail": "Node v22.23.4, coincide con el runtime esperado. npm 10.9.9. Códigos 0.",
+      "evidence": "artifacts/validation-16.4.3/node-runtime.txt"
     },
     {
       "name": "npm_ci",
       "command": "npm ci",
       "result": "pass",
-      "detail": "Instalación limpia correcta: 368 paquetes, código 0. npm ci informó 7 vulnerabilidades; no se ejecutó npm audit fix.",
-      "evidence": "artifacts/validation/npm-ci.txt"
+      "detail": "Instalación limpia correcta: added 368 packages, and audited 369 packages, código 0. npm ci informó 7 vulnerabilities (1 low, 2 moderate, 4 high). No se ejecutó npm audit fix.",
+      "evidence": "artifacts/validation-16.4.3/npm-ci.txt"
     },
     {
       "name": "lint",
       "command": "npm run lint",
       "result": "pass",
-      "detail": "eslint terminó sin errores.",
-      "evidence": "artifacts/validation/lint.txt"
+      "detail": "eslint terminó sin errores, código 0.",
+      "evidence": "artifacts/validation-16.4.3/lint.txt"
     },
     {
       "name": "typecheck",
       "command": "npx tsc --noEmit",
       "result": "pass",
       "detail": "tsc --noEmit terminó con código 0 y sin diagnósticos.",
-      "evidence": "artifacts/validation/typecheck.txt"
+      "evidence": "artifacts/validation-16.4.3/typecheck.txt"
     },
     {
       "name": "test",
       "command": "npm test",
       "result": "pass",
-      "detail": "18 pruebas, 0 fallos. Hay avisos de módulo sin type y de SQLite experimental; el comando terminó en 0.",
-      "evidence": "artifacts/validation/test.txt"
+      "detail": "20 pruebas, 20 pass, 0 fail, 0 skipped, código 0. Los tests de periodos usan SCHOLARSHIP_DB_PATH en un sqlite temporal.",
+      "evidence": "artifacts/validation-16.4.3/test.txt"
     },
     {
       "name": "build",
       "command": "npm run build",
       "result": "pass",
-      "detail": "next build 16.4.1 compiló y generó las rutas estáticas y dinámicas.",
-      "evidence": "artifacts/validation/build.txt"
+      "detail": "next build imprimió Next.js 16.4.3 (Turbopack), compiló y generó las páginas, código 0.",
+      "evidence": "artifacts/validation-16.4.3/build.txt"
     },
     {
-      "name": "sharp_and_versions",
-      "command": "node --input-type=commonjs -e 'JSON.parse(package.json y node_modules/sharp/package.json); require(\"sharp\")'",
+      "name": "versions_sharp_nodemailer",
+      "command": "fs.readFileSync + JSON.parse de package.json, node_modules/sharp/package.json y package-lock.json; require('sharp')",
       "result": "pass",
-      "detail": "sharp 0.35.5 (>= 0.35.5) y require('sharp') es una función. next y eslint-config-next en package.json son 16.4.1.",
-      "evidence": "artifacts/validation/sharp-and-versions.txt"
+      "detail": "package.json dependencies.next=16.4.3, devDependencies.eslint-config-next=16.4.3, dependencies.nodemailer=10.0.6 exacto. node_modules/sharp/package.json version 0.35.5 (>= 0.35.5), leído por fs porque exports solo declara '.' y bloquea require del package.json. require('sharp') es function. Lockfile packages['node_modules/nodemailer'].version=10.0.6. Instalados: next 16.4.3, eslint-config-next 16.4.3, nodemailer 10.0.6.",
+      "evidence": "artifacts/validation-16.4.3/versions-sharp-nodemailer.txt"
+    },
+    {
+      "name": "npm_audit_before",
+      "command": "npm audit (árbol next 16.4.1 / nodemailer 8.0.7)",
+      "result": "skipped",
+      "detail": "No reejecutado. El commit 1ba16982180e7a4b6ffab460422d2dd785fa4d7c fija next 16.4.1 y nodemailer ^8.0.7; repetir npm audit sobre ese árbol exigiría revertir el lockfile. artifacts/npm-audit-before-16.4.3.txt cita metadata high=5, total=7, y nodemailer high con rango <=10.0.9, junto a brace-expansion, browserslist, js-yaml y source-map-js.",
+      "evidence": "artifacts/npm-audit-before-16.4.3.txt"
+    },
+    {
+      "name": "npm_audit_after",
+      "command": "npm audit",
+      "result": "pass",
+      "detail": "El comando imprimió el informe y salió con código 1 por avisos restantes; ese código no invalida el check y no se ejecutó npm audit fix. Recuento: 7 vulnerabilities (1 low, 2 moderate, 4 high). nodemailer 3.0.0 - 10.0.9 quedó Severity moderate. High ajenos: brace-expansion, browserslist, js-yaml, source-map-js. El otro moderate es baseline-browser-mapping; el low es @babel/core.",
+      "evidence": "artifacts/validation-16.4.3/npm-audit-after.txt"
     },
     {
       "name": "e2e_testsprite",
-      "command": "git diff --name-only main -- . && git status --short",
+      "command": "git diff --name-only 1ba16982180e7a4b6ffab460422d2dd785fa4d7c -- . && git status --short",
       "result": "skipped",
-      "detail": "el diff no toca superficie web; solo pines de dependencias, lockfile, .nvmrc, un test de pines en src/lib/runtime y artefactos de misión. TestSprite no se ejecuta.",
-      "evidence": "artifacts/validation/git-diff-status.txt"
+      "detail": "El diff no toca superficie web; solo dependencias, tests de pines y de la API de nodemailer en src/lib, y artefactos de misión. TestSprite no se ejecuta. Rutas observadas: execution.md, package-lock.json, package.json, plan.md, src/lib/runtime/security-pins.test.ts, src/lib/email/nodemailer-api.test.ts y artifacts/. Ninguna está en src/app, src/components, public ni en controladores.",
+      "evidence": "artifacts/validation-16.4.3/git-diff-status.txt"
     },
     {
       "name": "cleanup_sqlite",
       "command": "git status --short -- data/becas.sqlite",
       "result": "pass",
-      "detail": "data/becas.sqlite no sale en git status y conserva el hash 0707c713b386b5da94953285719a13ae0e23c58f. El test de periodos apunta SCHOLARSHIP_DB_PATH a un sqlite temporal.",
-      "evidence": "artifacts/validation/cleanup-sqlite.txt"
+      "detail": "Salida vacía y código 0. data/becas.sqlite está trackeado, no está ignorado y no aparece modificado después de npm test y npm run build.",
+      "evidence": "artifacts/validation-16.4.3/cleanup-sqlite.txt"
     }
   ]
 }

@@ -22,10 +22,17 @@ function compareVersions(left: string, right: string) {
   return 0;
 }
 
-test("next y eslint-config-next quedan fijados en 16.4.1", () => {
+test("next y eslint-config-next quedan fijados en 16.4.3", () => {
   const pkg = readJson("package.json");
-  assert.equal(pkg.dependencies.next, "16.4.1");
-  assert.equal(pkg.devDependencies["eslint-config-next"], "16.4.1");
+  assert.equal(pkg.dependencies.next, "16.4.3");
+  assert.equal(pkg.devDependencies["eslint-config-next"], "16.4.3");
+});
+
+test("nodemailer queda en la primera versión que cierra los avisos high", () => {
+  const pkg = readJson("package.json");
+  const lock = readJson("package-lock.json");
+  assert.equal(pkg.dependencies.nodemailer, "10.0.6");
+  assert.equal(lock.packages?.["node_modules/nodemailer"]?.version, "10.0.6");
 });
 
 test("Node.js queda fijado en 22.23.4", () => {
@@ -34,11 +41,11 @@ test("Node.js queda fijado en 22.23.4", () => {
   assert.equal(readFileSync(path.join(root, ".nvmrc"), "utf8").trim(), "22.23.4");
 });
 
-test("el lockfile resuelve sharp >= 0.35.5 y @next/* en 16.4.1", () => {
+test("el lockfile resuelve sharp >= 0.35.5 y @next/* en 16.4.3", () => {
   const lock = readJson("package-lock.json");
   const packages = lock.packages ?? {};
-  assert.equal(packages["node_modules/next"]?.version, "16.4.1");
-  assert.equal(packages["node_modules/eslint-config-next"]?.version, "16.4.1");
+  assert.equal(packages["node_modules/next"]?.version, "16.4.3");
+  assert.equal(packages["node_modules/eslint-config-next"]?.version, "16.4.3");
   const sharp = packages["node_modules/sharp"];
   assert.ok(sharp, "sharp tiene que estar resuelto en el lockfile");
   assert.equal(compareVersions(sharp.version, "0.35.5") >= 0, true, sharp.version);
@@ -46,7 +53,7 @@ test("el lockfile resuelve sharp >= 0.35.5 y @next/* en 16.4.1", () => {
   const nextPackages = Object.entries(packages).filter(([name]) => name.includes("node_modules/@next/"));
   assert.ok(nextPackages.length > 0, "el lockfile tiene que incluir paquetes @next/*");
   for (const [name, meta] of nextPackages) {
-    assert.equal((meta as { version?: string }).version, "16.4.1", name);
+    assert.equal((meta as { version?: string }).version, "16.4.3", name);
   }
 });
 

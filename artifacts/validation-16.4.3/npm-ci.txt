@@ -1,0 +1,19 @@
+command: npm ci
+started: 2026-10-23T19:09:04Z
+
+added 368 packages, and audited 369 packages in 6s
+
+145 packages are looking for funding
+  run `npm fund` for details
+
+7 vulnerabilities (1 low, 2 moderate, 4 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm_ci_exit:0
+finished: 2026-10-23T19:09:10Z

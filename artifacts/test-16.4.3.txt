@@ -1,0 +1,171 @@
+
+> becas-app@0.1.0 test
+> node --experimental-strip-types --test src/lib/google-sheets/parse-sheet-rows.test.ts src/lib/time/madrid.test.ts src/lib/admin/session-token.test.ts src/lib/admin/rate-limit.test.ts src/lib/admin/origin.test.ts src/lib/scholarship-periods/resolve.test.ts src/lib/scholarship-periods/repository.test.ts src/lib/runtime/security-pins.test.ts src/lib/email/nodemailer-api.test.ts
+
+TAP version 13
+# (node:5887) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/admin/origin.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: accepts only an origin that matches the request host
+ok 1 - accepts only an origin that matches the request host
+  ---
+  duration_ms: 0.683578
+  type: 'test'
+  ...
+# (node:5888) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/admin/rate-limit.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: locks an address after five failed logins inside the window
+ok 2 - locks an address after five failed logins inside the window
+  ---
+  duration_ms: 0.536036
+  type: 'test'
+  ...
+# (node:5889) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/admin/session-token.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: compares admin passwords without accepting a different value
+ok 3 - compares admin passwords without accepting a different value
+  ---
+  duration_ms: 0.82244
+  type: 'test'
+  ...
+# Subtest: accepts a signed session until it expires
+ok 4 - accepts a signed session until it expires
+  ---
+  duration_ms: 0.544955
+  type: 'test'
+  ...
+# (node:5908) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/email/nodemailer-api.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: sendMail accepts the fields used by the scholarship notification
+ok 5 - sendMail accepts the fields used by the scholarship notification
+  ---
+  duration_ms: 6.632827
+  type: 'test'
+  ...
+# (node:5909) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/google-sheets/parse-sheet-rows.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: parseScholarshipApplicationRows maps spreadsheet values to application records
+ok 6 - parseScholarshipApplicationRows maps spreadsheet values to application records
+  ---
+  duration_ms: 1.135405
+  type: 'test'
+  ...
+# Subtest: parseScholarshipApplicationRows skips header and empty rows
+ok 7 - parseScholarshipApplicationRows skips header and empty rows
+  ---
+  duration_ms: 0.188079
+  type: 'test'
+  ...
+# (node:5911) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/runtime/security-pins.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: next y eslint-config-next quedan fijados en 16.4.3
+ok 8 - next y eslint-config-next quedan fijados en 16.4.3
+  ---
+  duration_ms: 0.737874
+  type: 'test'
+  ...
+# Subtest: nodemailer queda en la primera versión que cierra los avisos high
+ok 9 - nodemailer queda en la primera versión que cierra los avisos high
+  ---
+  duration_ms: 2.363855
+  type: 'test'
+  ...
+# Subtest: Node.js queda fijado en 22.23.4
+ok 10 - Node.js queda fijado en 22.23.4
+  ---
+  duration_ms: 0.331504
+  type: 'test'
+  ...
+# Subtest: el lockfile resuelve sharp >= 0.35.5 y @next/* en 16.4.3
+ok 11 - el lockfile resuelve sharp >= 0.35.5 y @next/* en 16.4.3
+  ---
+  duration_ms: 1.246473
+  type: 'test'
+  ...
+# Subtest: Dockerfile, nixpacks y railpack, si existen, fijan Node 22.23.4
+ok 12 - Dockerfile, nixpacks y railpack, si existen, fijan Node 22.23.4
+  ---
+  duration_ms: 0.211051
+  type: 'test'
+  ...
+# (node:5929) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/scholarship-periods/repository.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# (node:5929) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# Subtest: stores convocatorias and lets only the current one open the public form
+ok 13 - stores convocatorias and lets only the current one open the public form
+  ---
+  duration_ms: 45.676831
+  type: 'test'
+  ...
+# (node:5936) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/scholarship-periods/resolve.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: stays closed when there is no current period
+ok 14 - stays closed when there is no current period
+  ---
+  duration_ms: 0.901904
+  type: 'test'
+  ...
+# Subtest: opens only inside the automatic window
+ok 15 - opens only inside the automatic window
+  ---
+  duration_ms: 0.124653
+  type: 'test'
+  ...
+# Subtest: manual override wins over the dates
+ok 16 - manual override wins over the dates
+  ---
+  duration_ms: 0.093487
+  type: 'test'
+  ...
+# (node:5946) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///workspace/src/lib/time/madrid.test.ts is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to /workspace/package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: converts Madrid winter time to UTC
+ok 17 - converts Madrid winter time to UTC
+  ---
+  duration_ms: 10.224104
+  type: 'test'
+  ...
+# Subtest: converts Madrid summer time to UTC
+ok 18 - converts Madrid summer time to UTC
+  ---
+  duration_ms: 0.397633
+  type: 'test'
+  ...
+# Subtest: rejects a local time skipped by the spring clock change
+ok 19 - rejects a local time skipped by the spring clock change
+  ---
+  duration_ms: 0.271781
+  type: 'test'
+  ...
+# Subtest: round-trips a Madrid instant back to the datetime-local value
+ok 20 - round-trips a Madrid instant back to the datetime-local value
+  ---
+  duration_ms: 0.957422
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 261.412878

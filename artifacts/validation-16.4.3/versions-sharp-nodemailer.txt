@@ -1,0 +1,42 @@
+command: read package.json, node_modules/sharp/package.json, package-lock.json node_modules/nodemailer; require('sharp')
+started: 2026-10-23T19:09:51Z
+{
+  "packageJson": {
+    "dependenciesNext": "16.4.3",
+    "devDependenciesEslintConfigNext": "16.4.3",
+    "dependenciesNodemailer": "10.0.6"
+  },
+  "installed": {
+    "next": "16.4.3",
+    "eslintConfigNext": "16.4.3",
+    "nodemailer": "10.0.6",
+    "sharp": "0.35.5"
+  },
+  "sharp": {
+    "version": "0.35.5",
+    "exportKeys": [
+      "."
+    ],
+    "packageJsonExportBlocked": true,
+    "requireType": "function",
+    "requireError": "",
+    "readMethod": "fs.readFileSync + JSON.parse (exports solo declara '.')"
+  },
+  "lockfile": {
+    "nodemailer": {
+      "version": "10.0.6",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-10.0.6.tgz"
+    }
+  },
+  "checks": {
+    "package.json dependencies.next === 16.4.3": true,
+    "package.json devDependencies.eslint-config-next === 16.4.3": true,
+    "package.json dependencies.nodemailer === 10.0.6 exact": true,
+    "node_modules/sharp/package.json version >= 0.35.5": true,
+    "require('sharp') is function": true,
+    "lockfile node_modules/nodemailer version === 10.0.6": true
+  },
+  "allPass": true
+}
+script_exit:0
+finished: 2026-10-23T19:09:51Z

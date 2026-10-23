@@ -89,3 +89,48 @@ Rol distinto. No tocó código de producción. Reejecutó `npm ci`, `npm run lin
 - `README.md`: Node 22.23.4, `.nvmrc`, ausencia de Dockerfile/Nixpacks/Railpack, y `tsc --noEmit` en la verificación.
 - `CHANGELOG.md`: entrada 2026-10-23. El repositorio no tenía changelog previo.
 - Estos archivos no cambian el comportamiento ni la superficie web. No se repitió la E2E.
+
+## Encargo 2 — decisión antes de implementar
+
+- `npm view next@16.4.3`, `eslint-config-next@16.4.3` y `@next/env@16.4.3` devuelven `16.4.3`. `optionalDependencies.sharp` de next 16.4.3 sigue en `^0.35.5`.
+- La primera versión de nodemailer que cierra los cuatro avisos high es `10.0.6` (GHSA-v53p-9fqp-m79j). Se fija exacta. No se usa `npm audit fix` ni `10.2.1`.
+- El major trae rupturas (TLS en descargas remotas/OAuth2/proxy, y Node >= 20). El código de envío no usa esas rutas y Node ya es 22.23.4. No se edita `scholarship-notification.ts` salvo que el test de `sendMail` o `tsc` demuestren una rotura. En ese caso se revierte nodemailer y se documenta.
+- TDD: el test de pines se actualiza primero y se ejecuta en rojo. El test de la forma de `sendMail` se ejecuta en verde con nodemailer 8.0.7 y tiene que seguir en verde con 10.0.6.
+- `npm audit` de partida guardado en `artifacts/npm-audit-before-16.4.3.txt`: 5 high, 1 moderate, 1 low. nodemailer está en high, rango `<=10.0.9`, instalado `8.0.7`.
+- Revisión de seguridad: [YES] Reason: ver la sección «Encargo 2» de `plan.md`.
+
+### RED
+
+- `src/lib/runtime/security-pins.test.ts` contra el árbol 16.4.1 / nodemailer 8.0.7: código 1, 3 fallos y 2 pasos (Node y ausencia de Dockerfile). Evidencia `artifacts/red-16.4.3-pins.txt`.
+- `src/lib/email/nodemailer-api.test.ts` en nodemailer 8.0.7: código 0. La forma `createTransport` + `sendMail` que usa la app ya funciona. Evidencia `artifacts/nodemailer-api-before.txt`.
+
+### GREEN
+
+- `npm install next@16.4.3 eslint-config-next@16.4.3 nodemailer@10.0.6 --save-exact` (código 0).
+- No se editó `src/lib/email/scholarship-notification.ts`. El test de `sendMail` sigue en verde con 10.0.6 (`artifacts/nodemailer-api-after.txt`). `tsc --noEmit` también, con `@types/nodemailer` ^8 sin cambios.
+- Lockfile: next, eslint-config-next y todos los `@next/*` en 16.4.3. sharp 0.35.5. nodemailer 10.0.6.
+- Pines: 5/5 (`artifacts/green-16.4.3-pins.txt`).
+- Chequeos del implementador: `npm ci` 0, lint 0, `tsc --noEmit` 0, `npm test` 20/20, `npm run build` 0 (Next.js 16.4.3).
+
+### npm audit
+
+- Antes (`artifacts/npm-audit-before-16.4.3.txt`): 5 high, 1 moderate, 1 low. nodemailer high, rango `<=10.0.9`.
+- Después (`artifacts/npm-audit-after-16.4.3.txt`): 4 high, 2 moderate, 1 low. nodemailer baja a moderate, rango `3.0.0 - 10.0.9`.
+- Siguen en high, fuera de este encargo: brace-expansion, browserslist, js-yaml, source-map-js.
+- Moderates que quedan en nodemailer 10.0.6: DKIM cuadrático (GHSA-39m8-27wv-hr27, parche en 10.0.10; ya afectaba a 8.0.7) y el local-part entrecomillado (GHSA-g57g-f23g-4646, rango `>=9.1.0 <10.0.9`, no afectaba a 8.0.7; primera versión fuera de ese rango: 10.0.9). No se sube más: el encargo pide la primera versión que cierra el high, que es 10.0.6.
+
+### Review de código
+
+Rol distinto. VEREDICTO APROBADO. Sin bloqueos. El moderate residual de nodemailer queda anotado como no bloqueante.
+
+### Validación independiente
+
+Rol distinto. No tocó código de producción. Reescribió `verification.json` con `status: passed`. Evidencia en `artifacts/validation-16.4.3/`.
+
+`npm_audit_before` quedó `skipped`: este rol no reejecutó el árbol 16.4.1 / nodemailer 8.0.7. El informe sí se ejecutó en la implementación y está en `artifacts/npm-audit-before-16.4.3.txt`. `npm_audit_after` lo ejecutó el validador: nodemailer moderate, código de salida 1 por el resto de avisos.
+
+`e2e_testsprite` quedó `skipped`: el diff no toca superficie web. TestSprite no se ejecutó.
+
+### Documentación
+
+`CHANGELOG.md` gana una entrada del 2026-10-23 para 16.4.3 y nodemailer 10.0.6, encima de la entrada del primer parche. La descripción de la PR #8 se actualiza después del push.
