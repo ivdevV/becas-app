@@ -1,0 +1,16 @@
+=== git status --short -- data/becas.sqlite ===
+(empty above means clean)
+=== git status --short ===
+ M package-lock.json
+ M package.json
+?? .nvmrc
+?? artifacts/
+?? execution.md
+?? plan.md
+?? src/lib/runtime/
+=== hash before tests was 0707c713b386b5da94953285719a13ae0e23c58f ===
+hash now: 0707c713b386b5da94953285719a13ae0e23c58f
+=== stat ===
+data/becas.sqlite 16384 2026-10-23 18:38:05.926807216 +0000
+=== diff stat vs HEAD for sqlite ===
+EXIT:0

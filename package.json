@@ -3,17 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.13.0"
+    "node": "22.23.4"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --test src/lib/google-sheets/parse-sheet-rows.test.ts src/lib/time/madrid.test.ts src/lib/admin/session-token.test.ts src/lib/admin/rate-limit.test.ts src/lib/admin/origin.test.ts src/lib/scholarship-periods/resolve.test.ts src/lib/scholarship-periods/repository.test.ts"
+    "test": "node --experimental-strip-types --test src/lib/google-sheets/parse-sheet-rows.test.ts src/lib/time/madrid.test.ts src/lib/admin/session-token.test.ts src/lib/admin/rate-limit.test.ts src/lib/admin/origin.test.ts src/lib/scholarship-periods/resolve.test.ts src/lib/scholarship-periods/repository.test.ts src/lib/runtime/security-pins.test.ts"
   },
   "dependencies": {
-    "next": "16.2.6",
+    "next": "16.4.1",
     "nodemailer": "^8.0.7",
     "react": "19.2.4",
     "react-dom": "19.2.4"
@@ -25,7 +25,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "16.4.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

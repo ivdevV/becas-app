@@ -61,14 +61,16 @@ SCHOLARSHIP_ADMIN_SESSION_SECRET="un_secreto_de_sesion_de_al_menos_32_caracteres
 
 La clave necesita al menos 12 caracteres y el secreto de sesion al menos 32. En Coolify marca las dos como disponibles en runtime y reinicia. Si el valor contiene `$`, escribelo como `$$`; si no, Coolify lo recorta y el panel sigue cerrado. La sesion dura 8 horas, va en una cookie `httpOnly` y los intentos fallidos se limitan. La clave no se guarda en la base.
 
-Las convocatorias viven en `data/becas.sqlite`, incluido en el repositorio para el primer despliegue de Coolify. Ese archivo solo contiene periodos, no solicitudes ni secretos. La app necesita Node.js 22.13 o superior por `node:sqlite`.
+Las convocatorias viven en `data/becas.sqlite`, incluido en el repositorio para el primer despliegue de Coolify. Ese archivo solo contiene periodos, no solicitudes ni secretos. La app necesita Node.js 22.23.4, fijado en `.nvmrc` y en `engines`. Hace falta la línea 22 por `node:sqlite`, y 22.23.4 es la release de seguridad del 21/10/2026. No hay Dockerfile, Nixpacks ni Railpack en el repositorio: el entorno de Coolify tiene que usar esa misma versión.
 
 Para que los cambios del panel sobrevivan al siguiente despliegue, monta en Coolify un volumen persistente sobre la carpeta `data`. Un volumen vacio tapa el archivo de la imagen; en ese caso la app crea la base al arrancar. Si no hay volumen, cada despliegue vuelve a la copia del repositorio.
 
 ## Desarrollo
 
+Usa Node.js 22.23.4 (`nvm use` lee `.nvmrc`).
+
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -78,6 +80,7 @@ Abre `http://localhost:3000`.
 
 ```bash
 npm run lint
+npx tsc --noEmit
 npm test
 npm run build
 ```

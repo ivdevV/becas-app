@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "environment": {
+    "runtime": "node v22.23.4 / npm 10.9.9",
+    "database": "sqlite temporal de los tests (SCHOLARSHIP_DB_PATH); data/becas.sqlite del repo no se usa ni se modifica",
+    "base_commit": "ba8987a7c20052f4128422f64776ab2589d5e606"
+  },
+  "model_tier_used": "grok-4.7",
+  "escalations": [],
+  "checks": [
+    {
+      "name": "node_runtime",
+      "command": "node -v && npm -v",
+      "result": "pass",
+      "detail": "Node v22.23.4, coincide con el runtime esperado. npm 10.9.9.",
+      "evidence": "artifacts/validation/node-runtime.txt"
+    },
+    {
+      "name": "npm_ci",
+      "command": "npm ci",
+      "result": "pass",
+      "detail": "Instalación limpia correcta: 368 paquetes, código 0. npm ci informó 7 vulnerabilidades; no se ejecutó npm audit fix.",
+      "evidence": "artifacts/validation/npm-ci.txt"
+    },
+    {
+      "name": "lint",
+      "command": "npm run lint",
+      "result": "pass",
+      "detail": "eslint terminó sin errores.",
+      "evidence": "artifacts/validation/lint.txt"
+    },
+    {
+      "name": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "pass",
+      "detail": "tsc --noEmit terminó con código 0 y sin diagnósticos.",
+      "evidence": "artifacts/validation/typecheck.txt"
+    },
+    {
+      "name": "test",
+      "command": "npm test",
+      "result": "pass",
+      "detail": "18 pruebas, 0 fallos. Hay avisos de módulo sin type y de SQLite experimental; el comando terminó en 0.",
+      "evidence": "artifacts/validation/test.txt"
+    },
+    {
+      "name": "build",
+      "command": "npm run build",
+      "result": "pass",
+      "detail": "next build 16.4.1 compiló y generó las rutas estáticas y dinámicas.",
+      "evidence": "artifacts/validation/build.txt"
+    },
+    {
+      "name": "sharp_and_versions",
+      "command": "node --input-type=commonjs -e 'JSON.parse(package.json y node_modules/sharp/package.json); require(\"sharp\")'",
+      "result": "pass",
+      "detail": "sharp 0.35.5 (>= 0.35.5) y require('sharp') es una función. next y eslint-config-next en package.json son 16.4.1.",
+      "evidence": "artifacts/validation/sharp-and-versions.txt"
+    },
+    {
+      "name": "e2e_testsprite",
+      "command": "git diff --name-only main -- . && git status --short",
+      "result": "skipped",
+      "detail": "el diff no toca superficie web; solo pines de dependencias, lockfile, .nvmrc, un test de pines en src/lib/runtime y artefactos de misión. TestSprite no se ejecuta.",
+      "evidence": "artifacts/validation/git-diff-status.txt"
+    },
+    {
+      "name": "cleanup_sqlite",
+      "command": "git status --short -- data/becas.sqlite",
+      "result": "pass",
+      "detail": "data/becas.sqlite no sale en git status y conserva el hash 0707c713b386b5da94953285719a13ae0e23c58f. El test de periodos apunta SCHOLARSHIP_DB_PATH a un sqlite temporal.",
+      "evidence": "artifacts/validation/cleanup-sqlite.txt"
+    }
+  ]
+}
