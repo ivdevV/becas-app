@@ -1,0 +1,9 @@
+$ git status --short -- data/becas.sqlite
+exit:0
+
+$ git ls-files --error-unmatch data/becas.sqlite
+data/becas.sqlite
+ls_files_exit:0
+
+$ git check-ignore -v data/becas.sqlite || true
+check_ignore_exit:1

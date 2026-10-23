@@ -1,0 +1,14 @@
+$ npm ci
+
+added 368 packages, and audited 369 packages in 5s
+
+145 packages are looking for funding
+  run `npm fund` for details
+
+6 vulnerabilities (1 low, 1 moderate, 4 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+exit:0

@@ -28,11 +28,11 @@ test("next y eslint-config-next quedan fijados en 16.4.3", () => {
   assert.equal(pkg.devDependencies["eslint-config-next"], "16.4.3");
 });
 
-test("nodemailer queda en la primera versión que cierra los avisos high", () => {
+test("nodemailer queda fijado en 10.0.10", () => {
   const pkg = readJson("package.json");
   const lock = readJson("package-lock.json");
-  assert.equal(pkg.dependencies.nodemailer, "10.0.6");
-  assert.equal(lock.packages?.["node_modules/nodemailer"]?.version, "10.0.6");
+  assert.equal(pkg.dependencies.nodemailer, "10.0.10");
+  assert.equal(lock.packages?.["node_modules/nodemailer"]?.version, "10.0.10");
 });
 
 test("Node.js queda fijado en 22.23.4", () => {

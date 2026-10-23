@@ -1,0 +1,33 @@
+$ git rev-parse 2424b12
+2424b127fbb6a2174311f37396dd9014b4aba6b1
+exit:0
+
+$ git diff --name-only 2424b12 -- .
+execution.md
+package-lock.json
+package.json
+plan.md
+src/lib/runtime/security-pins.test.ts
+verification.json
+exit:0
+
+$ git status --short
+ M execution.md
+ M package-lock.json
+ M package.json
+ M plan.md
+ M src/lib/runtime/security-pins.test.ts
+ M verification.json
+?? artifacts/build-10.0.10.txt
+?? artifacts/green-10.0.10-pins.txt
+?? artifacts/lint-10.0.10.txt
+?? artifacts/nodemailer-api-after-10.0.10.txt
+?? artifacts/nodemailer-api-before-10.0.10.txt
+?? artifacts/npm-audit-after-10.0.10.txt
+?? artifacts/npm-audit-before-10.0.10.txt
+?? artifacts/npm-ci-10.0.10.txt
+?? artifacts/red-10.0.10-pins.txt
+?? artifacts/test-10.0.10.txt
+?? artifacts/typecheck-10.0.10.txt
+?? artifacts/validation-10.0.10/
+exit:0

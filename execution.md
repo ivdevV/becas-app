@@ -134,3 +134,25 @@ Rol distinto. No tocó código de producción. Reescribió `verification.json` c
 ### Documentación
 
 `CHANGELOG.md` gana una entrada del 2026-10-23 para 16.4.3 y nodemailer 10.0.6, encima de la entrada del primer parche. La descripción de la PR #8 se actualiza después del push.
+
+## Encargo 3 — decisión antes de implementar
+
+- `npm view nodemailer@10.0.10 version` → `10.0.10`.
+- GHSA-g57g-f23g-4646: primera parcheada 10.0.9. GHSA-39m8-27wv-hr27: primera parcheada 10.0.10. 10.0.10 cierra los dos.
+- Changelog 10.0.7–10.0.10: solo bug fixes. No se edita el código de envío salvo rotura.
+- TDD: el pin de nodemailer se cambia a 10.0.10 y se ejecuta en rojo antes del install. El test de `jsonTransport` se ejecuta en verde con 10.0.6 y tiene que seguir en verde con 10.0.10. Si falla, se revierte.
+- Revisión de seguridad: [YES] Reason: ver «Encargo 3» de `plan.md`.
+- Publicación autorizada: commit y push a `cursor/next-16-4-1-security-fff1` y actualizar la PR #8. Nada más.
+
+### RED
+
+- Pin de nodemailer exigiendo 10.0.10 contra el árbol 10.0.6: código 1, 1 fallo y 4 pasos. Evidencia `artifacts/red-10.0.10-pins.txt`.
+- Contrato `jsonTransport` en 10.0.6: código 0. Evidencia `artifacts/nodemailer-api-before-10.0.10.txt`.
+- `npm audit` antes: 4 high, 2 moderate, 1 low. nodemailer moderate con GHSA-g57g-f23g-4646 y GHSA-39m8-27wv-hr27. Evidencia `artifacts/npm-audit-before-10.0.10.txt`.
+
+### GREEN
+
+- `npm install nodemailer@10.0.10 --save-exact`. next 16.4.3, sharp 0.35.5, nodemailer 10.0.10. No se editó `scholarship-notification.ts`.
+- Contrato `jsonTransport` en 10.0.10: código 0 (`artifacts/nodemailer-api-after-10.0.10.txt`).
+- Pines 5/5. `npm ci` 0, lint 0, `tsc --noEmit` 0, `npm test` 20/20, `npm run build` 0 (Next.js 16.4.3).
+- `npm audit` después: código 1 por avisos restantes; 4 high, 1 moderate, 1 low. nodemailer ya no aparece. Evidencia `artifacts/npm-audit-after-10.0.10.txt`.

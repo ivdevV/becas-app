@@ -2,6 +2,25 @@
 
 ## 2026-10-23
 
+### Seguridad — nodemailer 10.0.10
+
+- `nodemailer` pasa de 10.0.6 a 10.0.10 exacto. Cierra GHSA-g57g-f23g-4646 (primera parcheada 10.0.9) y GHSA-39m8-27wv-hr27 (primera parcheada 10.0.10).
+- `next`, `eslint-config-next` y los `@next/*` siguen en 16.4.3. `sharp` sigue en 0.35.5.
+- El changelog de nodemailer entre 10.0.7 y 10.0.10 solo tiene correcciones. `src/lib/email/scholarship-notification.ts` no cambia. El test de contrato sigue usando `jsonTransport`, sin red.
+
+### Auditoría
+
+- Antes, con 10.0.6: 4 high, 2 moderate, 1 low. nodemailer moderate, con los dos GHSA de arriba.
+- Después, con 10.0.10: 4 high, 1 moderate, 1 low. nodemailer ya no aparece.
+- Siguen en high: `brace-expansion`, `browserslist`, `js-yaml`, `source-map-js`. El moderate restante es `baseline-browser-mapping`. El low es `@babel/core`.
+
+### Pruebas
+
+- `npm ci`, `npm run lint`, `npx tsc --noEmit`, `npm test` (20 pruebas) y `npm run build` pasan en Node v22.23.4.
+- TestSprite no se ejecutó: el diff no toca la superficie web.
+
+## 2026-10-23
+
 ### Seguridad — Next.js 16.4.3 y nodemailer 10.0.6
 
 - `next`, `eslint-config-next` y los `@next/*` del lockfile pasan de 16.4.1 a 16.4.3. `sharp` sigue resuelto en 0.35.5.
@@ -12,7 +31,7 @@
 - Antes: 5 high, 1 moderate, 1 low. `nodemailer` high, rango `<=10.0.9`.
 - Después: 4 high, 2 moderate, 1 low. `nodemailer` baja a moderate.
 - Siguen en high, fuera de este cambio: `brace-expansion`, `browserslist`, `js-yaml`, `source-map-js`.
-- En nodemailer 10.0.6 quedan dos moderate: DKIM cuadrático (GHSA-39m8-27wv-hr27, parche en 10.0.10; ya afectaba a 8.0.7) y el local-part entrecomillado (GHSA-g57g-f23g-4646, rango `>=9.1.0 <10.0.9`, que 8.0.7 no tenía). No se sube a 10.0.9 ni a 10.0.10: el encargo pide la primera versión del high.
+- En este paso, nodemailer 10.0.6 dejaba dos moderate: DKIM cuadrático (GHSA-39m8-27wv-hr27, parche en 10.0.10) y el local-part entrecomillado (GHSA-g57g-f23g-4646, parche en 10.0.9). El encargo pedía la primera versión del high. Esos dos avisos se cierran en la entrada superior, con 10.0.10.
 
 ### Pruebas
 

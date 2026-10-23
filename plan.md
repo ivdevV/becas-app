@@ -141,3 +141,32 @@ Si al instalar 10.0.6 el test de esa forma de llamada falla, o `tsc` exige reesc
 El test de pines pasa a exigir Next 16.4.3 y nodemailer 10.0.6: rojo contra el árbol actual, verde después del install. Un test de `jsonTransport` cubre la forma de `sendMail` que usa la app y debe seguir en verde antes y después; si pasa a rojo, la API rompió y se detiene nodemailer. No hay exploit de las CVE.
 
 E2E TestSprite: el diff previsto no toca vistas, plantillas, assets ni controladores. `e2e_testsprite` queda `skipped` con esa justificación. Si hubiera que editar `src/app` o componentes para una rotura, la E2E pasaría a ser obligatoria.
+
+## Encargo 3 (23/10/2026) — nodemailer 10.0.10
+
+Misma rama `cursor/next-16-4-1-security-fff1` y misma PR #8. Clasificación: **full**. Tier: **standard** (dependencia de seguridad).
+
+### Comprobación previa
+
+- `npm view nodemailer@10.0.10 version` devuelve `10.0.10`.
+- GHSA-g57g-f23g-4646 (medium): rango `>= 9.1.0, < 10.0.9`, primera parcheada `10.0.9`. 10.0.10 queda fuera del rango.
+- GHSA-39m8-27wv-hr27 (medium, CVE-2026-110871): rango `>= 3.0.0, <= 10.0.9`, primera parcheada `10.0.10`. 10.0.10 lo cierra.
+- El changelog de 10.0.7 a 10.0.10 solo tiene bug fixes (addressparser, DKIM, MIME, pool SMTP). No hay ruptura publicada. El contrato de envío no debe cambiar.
+
+### Alcance
+
+- Fijar `nodemailer` en `10.0.10` exacto en `package.json` y en el lockfile.
+- Mantener `next` y `eslint-config-next` en `16.4.3`, `@next/*` en `16.4.3` y `sharp` en `0.35.5`.
+- Mantener `src/lib/email/nodemailer-api.test.ts` sin red (`jsonTransport`).
+- No editar `scholarship-notification.ts` salvo que 10.0.10 rompa el contrato, `tsc` o el build. Si rompe, se revierte nodemailer y se explica. No se fuerza.
+- Repetir lint, `tsc --noEmit`, tests, build y `npm audit`.
+- Actualizar `verification.json`, `CHANGELOG.md` y la descripción de la PR #8.
+- Commit y push solo a `cursor/next-16-4-1-security-fff1`. No fusionar ni desplegar.
+
+### Revisión de seguridad
+
+[YES] Reason: 10.0.10 existe y es la primera versión que cierra a la vez GHSA-g57g-f23g-4646 y GHSA-39m8-27wv-hr27. El salto desde 10.0.6 es de parche, sin ruptura de API publicada y sin tocar autenticación, secretos, TLS ni el código de envío. Next permanece en 16.4.3 y sharp en 0.35.5.
+
+### TDD y E2E
+
+El test de pines pasa a exigir nodemailer `10.0.10`: rojo contra 10.0.6, verde después. El test de `jsonTransport` se ejecuta en verde antes y tiene que seguir en verde después; si falla, se detiene el salto. E2E TestSprite queda `skipped` si el diff no toca superficie web.
